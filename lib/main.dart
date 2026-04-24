@@ -5,6 +5,8 @@ void main() {
 }
 
 class Fleet1App extends StatelessWidget {
+  const Fleet1App({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,6 +18,8 @@ class Fleet1App extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
