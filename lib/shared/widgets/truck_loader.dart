@@ -62,6 +62,53 @@ class _TruckLoaderState extends State<TruckLoader>
 
 class _TruckRoadPainter extends CustomPainter {
   final double t; // 0 → 1 repeating
+  static final TextPainter _fleetTP = TextPainter(
+    text: const TextSpan(
+      text: 'FLEET',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 10,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.8,
+      ),
+    ),
+    textDirection: TextDirection.ltr,
+  )..layout();
+
+  static final TextPainter _oneTP = TextPainter(
+    text: const TextSpan(
+      text: '1',
+      style: TextStyle(
+        color: AppColors.primaryAmber,
+        fontSize: 10,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.8,
+      ),
+    ),
+    textDirection: TextDirection.ltr,
+  )..layout();
+
+  static final Paint _roadPaint = Paint()..color = const Color(0xFF374151);
+  static final Paint _roadTopPaint = Paint()..color = const Color(0xFF4B5563);
+  static final Paint _dashPaint = Paint()
+    ..color = Colors.white.withValues(alpha: 0.55)
+    ..strokeWidth = 2.5
+    ..strokeCap = StrokeCap.round;
+  static final Paint _shadowPaint = Paint()..color = Colors.black.withValues(alpha: 0.16);
+  static final Paint _cargoPaint = Paint()..color = AppColors.primaryNavy;
+  static final Paint _amberPaint = Paint()..color = AppColors.primaryAmber;
+  static final Paint _linePaint = Paint()
+    ..color = Colors.white.withValues(alpha: 0.08)
+    ..strokeWidth = 1;
+  static final Paint _windshieldPaint = Paint()..color = Colors.white.withValues(alpha: 0.88);
+  static final Paint _bumperPaint = Paint()..color = const Color(0xFF0F172A);
+  static final Paint _headlightPaint = Paint()..color = Colors.white;
+  static final Paint _headlightGlowPaint = Paint()..color = Colors.white.withValues(alpha: 0.22);
+  static final Paint _tirePaint = Paint()..color = const Color(0xFF1E293B);
+  static final Paint _rimPaint = Paint()..color = const Color(0xFF64748B);
+  static final Paint _hubPaint = Paint()..color = const Color(0xFFCBD5E1);
+  static final Paint _boltPaint = Paint()..color = const Color(0xFF94A3B8);
+
   const _TruckRoadPainter(this.t);
 
   @override
@@ -77,24 +124,20 @@ class _TruckRoadPainter extends CustomPainter {
         Rect.fromLTWH(0, roadTop, w, roadH),
         const Radius.circular(6),
       ),
-      Paint()..color = const Color(0xFF374151),
+      _roadPaint,
     );
     // top edge
     canvas.drawRect(
       Rect.fromLTWH(0, roadTop, w, 2.5),
-      Paint()..color = const Color(0xFF4B5563),
+      _roadTopPaint,
     );
 
     // ── Scrolling dashes ─────────────────────────────────
     const dW = 20.0, gap = 14.0;
     final dashY = roadTop + roadH * 0.48;
     final offset = t * (dW + gap);
-    final dashP = Paint()
-      ..color = Colors.white.withValues(alpha: 0.55)
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
     for (double x = -offset; x < w + dW; x += dW + gap) {
-      canvas.drawLine(Offset(x, dashY), Offset(x + dW, dashY), dashP);
+      canvas.drawLine(Offset(x, dashY), Offset(x + dW, dashY), _dashPaint);
     }
 
     // ── Geometry ─────────────────────────────────────────
@@ -120,7 +163,7 @@ class _TruckRoadPainter extends CustomPainter {
         width: (cW + cabW) * 0.78,
         height: h * 0.08,
       ),
-      Paint()..color = Colors.black.withValues(alpha: 0.16),
+      _shadowPaint,
     );
 
     canvas.save();
@@ -133,7 +176,7 @@ class _TruckRoadPainter extends CustomPainter {
         topLeft: const Radius.circular(4),
         bottomLeft: const Radius.circular(2),
       ),
-      Paint()..color = AppColors.primaryNavy,
+      _cargoPaint,
     );
     // amber top stripe
     canvas.drawRRect(
@@ -141,14 +184,11 @@ class _TruckRoadPainter extends CustomPainter {
         Rect.fromLTWH(cL, cT, cW, h * 0.065),
         topLeft: const Radius.circular(4),
       ),
-      Paint()..color = AppColors.primaryAmber,
+      _amberPaint,
     );
     // vertical panel lines for depth
-    final lineP = Paint()
-      ..color = Colors.white.withValues(alpha: 0.08)
-      ..strokeWidth = 1;
     for (double lx = cL + cW * 0.25; lx < cL + cW - 4; lx += cW * 0.25) {
-      canvas.drawLine(Offset(lx, cT + h * 0.07), Offset(lx, groundY), lineP);
+      canvas.drawLine(Offset(lx, cT + h * 0.07), Offset(lx, groundY), _linePaint);
     }
     // FLEET + 1 text
     _paintFleet1(canvas, Offset(cL + cW / 2, cT + cH * 0.57));
@@ -160,7 +200,7 @@ class _TruckRoadPainter extends CustomPainter {
         topRight: const Radius.circular(10),
         bottomRight: const Radius.circular(4),
       ),
-      Paint()..color = AppColors.primaryAmber,
+      _amberPaint,
     );
     // windshield
     canvas.drawRRect(
@@ -168,23 +208,23 @@ class _TruckRoadPainter extends CustomPainter {
         Rect.fromLTWH(cabL + 5, cabT + 5, cabW - 14, cabH * 0.52),
         const Radius.circular(5),
       ),
-      Paint()..color = Colors.white.withValues(alpha: 0.88),
+      _windshieldPaint,
     );
     // front bumper
     canvas.drawRect(
       Rect.fromLTWH(cabL + cabW - 5, cabT + cabH * 0.66, 5, cabH * 0.30),
-      Paint()..color = const Color(0xFF0F172A),
+      _bumperPaint,
     );
     // headlight
     canvas.drawCircle(
       Offset(cabL + cabW - 1, cabT + cabH * 0.82),
       4.5,
-      Paint()..color = Colors.white,
+      _headlightPaint,
     );
     canvas.drawCircle(
       Offset(cabL + cabW - 1, cabT + cabH * 0.82),
       8,
-      Paint()..color = Colors.white.withValues(alpha: 0.22),
+      _headlightGlowPaint,
     );
 
     // ── Wheels ───────────────────────────────────────────
@@ -204,60 +244,33 @@ class _TruckRoadPainter extends CustomPainter {
     final c = Offset(center.dx, cy);
 
     // tire
-    canvas.drawCircle(c, r, Paint()..color = const Color(0xFF1E293B));
+    canvas.drawCircle(c, r, _tirePaint);
     // rim
-    canvas.drawCircle(c, r * 0.62, Paint()..color = const Color(0xFF64748B));
+    canvas.drawCircle(c, r * 0.62, _rimPaint);
     // hub
-    canvas.drawCircle(c, r * 0.24, Paint()..color = const Color(0xFFCBD5E1));
+    canvas.drawCircle(c, r * 0.24, _hubPaint);
 
     // rotating lug bolts
     canvas.save();
     canvas.translate(c.dx, c.dy);
     canvas.rotate(t * 2 * math.pi);
-    final boltP = Paint()..color = const Color(0xFF94A3B8);
     for (int i = 0; i < 5; i++) {
       final angle = (i / 5) * 2 * math.pi;
       canvas.drawCircle(
         Offset(math.cos(angle) * r * 0.40, math.sin(angle) * r * 0.40),
         1.8,
-        boltP,
+        _boltPaint,
       );
     }
     canvas.restore();
   }
 
   void _paintFleet1(Canvas canvas, Offset center) {
-    final fleetTP = TextPainter(
-      text: const TextSpan(
-        text: 'FLEET',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.8,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    final oneTP = TextPainter(
-      text: const TextSpan(
-        text: '1',
-        style: TextStyle(
-          color: AppColors.primaryAmber,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.8,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    final totalW = fleetTP.width + oneTP.width;
+    final totalW = _fleetTP.width + _oneTP.width;
     final startX = center.dx - totalW / 2;
-    final textY = center.dy - fleetTP.height / 2;
-    fleetTP.paint(canvas, Offset(startX, textY));
-    oneTP.paint(canvas, Offset(startX + fleetTP.width, textY));
+    final textY = center.dy - _fleetTP.height / 2;
+    _fleetTP.paint(canvas, Offset(startX, textY));
+    _oneTP.paint(canvas, Offset(startX + _fleetTP.width, textY));
   }
 
   @override
