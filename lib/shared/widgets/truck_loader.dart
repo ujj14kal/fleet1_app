@@ -41,9 +41,8 @@ class _TruckLoaderState extends State<TruckLoader>
           height: 86,
           child: AnimatedBuilder(
             animation: _ctrl,
-            builder: (_, __) => CustomPaint(
-              painter: _TruckRoadPainter(_ctrl.value),
-            ),
+            builder: (_, __) =>
+                CustomPaint(painter: _TruckRoadPainter(_ctrl.value)),
           ),
         ),
         const SizedBox(height: 14),
@@ -72,7 +71,7 @@ class _TruckRoadPainter extends CustomPainter {
 
     // ── Road ─────────────────────────────────────────────
     final roadTop = h * 0.74;
-    final roadH   = h - roadTop;
+    final roadH = h - roadTop;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(0, roadTop, w, roadH),
@@ -101,6 +100,7 @@ class _TruckRoadPainter extends CustomPainter {
     // ── Geometry ─────────────────────────────────────────
     final wheelR = h * 0.132;
     final groundY = roadTop; // wheel bottom sits here
+    final bob = math.sin(t * 2 * math.pi) * h * 0.018;
 
     // cargo box
     const cL = 8.0;
@@ -113,6 +113,18 @@ class _TruckRoadPainter extends CustomPainter {
     final cabT = h * 0.24;
     final cabW = w * 0.268;
     final cabH = groundY - cabT;
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cL + (cW + cabW) * 0.5, groundY + h * 0.035),
+        width: (cW + cabW) * 0.78,
+        height: h * 0.08,
+      ),
+      Paint()..color = Colors.black.withValues(alpha: 0.16),
+    );
+
+    canvas.save();
+    canvas.translate(0, bob);
 
     // ── Cargo box ────────────────────────────────────────
     canvas.drawRRect(
@@ -184,6 +196,7 @@ class _TruckRoadPainter extends CustomPainter {
     for (final pos in wheelPositions) {
       _drawWheel(canvas, pos, wheelR);
     }
+    canvas.restore();
   }
 
   void _drawWheel(Canvas canvas, Offset center, double r) {
@@ -242,13 +255,55 @@ class _TruckRoadPainter extends CustomPainter {
 
     final totalW = fleetTP.width + oneTP.width;
     final startX = center.dx - totalW / 2;
-    final textY  = center.dy - fleetTP.height / 2;
+    final textY = center.dy - fleetTP.height / 2;
     fleetTP.paint(canvas, Offset(startX, textY));
     oneTP.paint(canvas, Offset(startX + fleetTP.width, textY));
   }
 
   @override
   bool shouldRepaint(covariant _TruckRoadPainter old) => old.t != t;
+}
+
+/// Compact loader for buttons and dense surfaces.
+class TruckLoaderCompact extends StatefulWidget {
+  final Color? roadColor;
+  const TruckLoaderCompact({super.key, this.roadColor});
+
+  @override
+  State<TruckLoaderCompact> createState() => _TruckLoaderCompactState();
+}
+
+class _TruckLoaderCompactState extends State<TruckLoaderCompact>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1050),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 112,
+      height: 38,
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) =>
+            CustomPaint(painter: _TruckRoadPainter(_ctrl.value)),
+      ),
+    );
+  }
 }
 
 /// Full-screen loader — use this when an entire page is loading.

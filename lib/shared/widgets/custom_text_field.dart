@@ -14,6 +14,7 @@ class Fleet1TextField extends StatelessWidget {
   final VoidCallback? onSuffixTap;
   final int? maxLength;
   final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
 
   const Fleet1TextField({
     super.key,
@@ -27,6 +28,7 @@ class Fleet1TextField extends StatelessWidget {
     this.onSuffixTap,
     this.maxLength,
     this.validator,
+    this.onChanged,
   });
 
   @override
@@ -34,9 +36,14 @@ class Fleet1TextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.inter(
-          fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary,
-        )),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
@@ -44,10 +51,15 @@ class Fleet1TextField extends StatelessWidget {
           obscureText: obscureText,
           maxLength: maxLength,
           validator: validator,
+          onChanged: onChanged,
           inputFormatters: keyboardType == TextInputType.phone
               ? [FilteringTextInputFormatter.digitsOnly]
               : null,
-          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             counterText: '',
@@ -59,7 +71,11 @@ class Fleet1TextField extends StatelessWidget {
             suffixIcon: suffixIcon != null
                 ? GestureDetector(
                     onTap: onSuffixTap,
-                    child: Icon(suffixIcon, color: AppColors.textMuted, size: 18),
+                    child: Icon(
+                      suffixIcon,
+                      color: AppColors.textMuted,
+                      size: 18,
+                    ),
                   )
                 : null,
             border: OutlineInputBorder(
@@ -72,10 +88,19 @@ class Fleet1TextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primaryNavy, width: 2),
+              borderSide: const BorderSide(
+                color: AppColors.primaryNavy,
+                width: 2,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+            hintStyle: GoogleFonts.inter(
+              color: AppColors.textMuted,
+              fontSize: 14,
+            ),
           ),
         ),
       ],

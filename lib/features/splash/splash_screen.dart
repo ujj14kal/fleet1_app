@@ -30,9 +30,15 @@ class _SplashScreenState extends State<SplashScreen> {
       final profile = await AuthService.getCurrentProfile();
       if (profile != null && mounted) {
         switch (profile.role) {
-          case 'manufacturer': context.go('/m/home'); return;
-          case 'transporter':  context.go('/t/home'); return;
-          default: context.go('/role'); return;
+          case 'manufacturer':
+            context.go('/m/home');
+            return;
+          case 'transporter':
+            context.go('/t/home');
+            return;
+          default:
+            context.go('/role');
+            return;
         }
       }
     }
@@ -49,73 +55,91 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Logo ──────────────────────────────────────────
             Container(
-              width: 108,
-              height: 108,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.35),
-                    blurRadius: 40,
-                    spreadRadius: 8,
+                  width: 126,
+                  height: 126,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryAmber,
+                    borderRadius: BorderRadius.circular(34),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryAmber.withValues(alpha: 0.38),
+                        blurRadius: 42,
+                        spreadRadius: 5,
+                      ),
+                      BoxShadow(
+                        color: AppColors.supportDark.withValues(alpha: 0.34),
+                        blurRadius: 28,
+                        offset: const Offset(0, 14),
+                      ),
+                    ],
                   ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryNavy,
+                      borderRadius: BorderRadius.circular(29),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        width: 1.5,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: Image.asset(
+                        'assets/images/logo_fleet1.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              padding: const EdgeInsets.all(10),
-              child: Image.asset(
-                'assets/images/logo_fleet1.png',
-                width: 88,
-                height: 88,
-              ),
-            )
-            .animate()
-            .scale(
-              begin: const Offset(0.3, 0.3),
-              end: const Offset(1.0, 1.0),
-              duration: 600.ms,
-              curve: Curves.elasticOut,
-            )
-            .fade(begin: 0, end: 1, duration: 300.ms),
+                )
+                .animate()
+                .scale(
+                  begin: const Offset(0.3, 0.3),
+                  end: const Offset(1.0, 1.0),
+                  duration: 600.ms,
+                  curve: Curves.elasticOut,
+                )
+                .fade(begin: 0, end: 1, duration: 300.ms),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // FLEET1 wordmark ────────────────────────────────
             Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  'FLEET',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.white,
-                    letterSpacing: 3,
-                    fontFamily: 'Inter',
-                  ),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      'FLEET',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.white,
+                        letterSpacing: 3,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    Text(
+                      '1',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primaryAmber,
+                        letterSpacing: 3,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                )
+                .animate(delay: 400.ms)
+                .fade(begin: 0, end: 1, duration: 500.ms)
+                .slideY(
+                  begin: 0.3,
+                  end: 0,
+                  duration: 500.ms,
+                  curve: Curves.easeOut,
                 ),
-                Text(
-                  '1',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.primaryAmber,
-                    letterSpacing: 3,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            )
-            .animate(delay: 400.ms)
-            .fade(begin: 0, end: 1, duration: 500.ms)
-            .slideY(begin: 0.3, end: 0, duration: 500.ms, curve: Curves.easeOut),
 
             const SizedBox(height: 8),
 
@@ -129,13 +153,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w500,
               ),
-            )
-            .animate(delay: 700.ms)
-            .fade(begin: 0, end: 1, duration: 500.ms),
+            ).animate(delay: 700.ms).fade(begin: 0, end: 1, duration: 500.ms),
           ],
         ),
       ),
     );
   }
 }
-
