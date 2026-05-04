@@ -267,7 +267,14 @@ class _TruckRoadPainter extends CustomPainter {
 /// Compact loader for buttons and dense surfaces.
 class TruckLoaderCompact extends StatefulWidget {
   final Color? roadColor;
-  const TruckLoaderCompact({super.key, this.roadColor});
+  final double width;
+  final double height;
+  const TruckLoaderCompact({
+    super.key,
+    this.roadColor,
+    this.width = 112,
+    this.height = 38,
+  });
 
   @override
   State<TruckLoaderCompact> createState() => _TruckLoaderCompactState();
@@ -295,8 +302,8 @@ class _TruckLoaderCompactState extends State<TruckLoaderCompact>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 112,
-      height: 38,
+      width: widget.width,
+      height: widget.height,
       child: AnimatedBuilder(
         animation: _ctrl,
         builder: (_, __) =>

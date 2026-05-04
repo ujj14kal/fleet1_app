@@ -8,6 +8,7 @@ import '../../../core/models/transporter_model.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/shipment_service.dart';
 import '../../../shared/widgets/truck_asset_image.dart';
+import '../../../shared/widgets/truck_loader.dart';
 
 class TFleetTab extends StatefulWidget {
   const TFleetTab({super.key});
@@ -87,9 +88,7 @@ class _TFleetTabState extends State<TFleetTab> {
         ],
       ),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryAmber),
-            )
+          ? const Center(child: TruckLoader(message: 'Loading fleet...'))
           : _trucks.isEmpty
           ? Center(
               child: Column(

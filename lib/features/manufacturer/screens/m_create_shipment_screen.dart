@@ -242,7 +242,6 @@ class _MCreateTabState extends State<MCreateTab> {
         'receiver_city': _receiverCity,
         'receiver_pincode': _rPincodeCtrl.text.trim(),
         'load_type_required': _loadType,
-        'truck_type_preferred': _selectedTruckId,
         'truck_type_required': _selectedTruckId,
         'status': 'pending',
       });

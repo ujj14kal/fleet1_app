@@ -18,6 +18,7 @@ class ShipmentModel {
   final String? receiverPincode;
   final String status;
   final String? loadTypeRequired; // 'part_load' | 'full_load'
+  final String? truckTypeRequired;
   final String? currentLocation;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -45,6 +46,7 @@ class ShipmentModel {
     this.receiverPincode,
     required this.status,
     this.loadTypeRequired,
+    this.truckTypeRequired,
     this.currentLocation,
     required this.createdAt,
     this.updatedAt,
@@ -71,9 +73,12 @@ class ShipmentModel {
     receiverPincode: json['receiver_pincode'] as String?,
     status: json['status'] as String? ?? 'pending',
     loadTypeRequired: json['load_type_required'] as String?,
+    truckTypeRequired: json['truck_type_required'] as String?,
     currentLocation: json['current_location'] as String?,
     createdAt: DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at']) : null,
+    updatedAt: json['updated_at'] != null
+        ? DateTime.tryParse(json['updated_at'])
+        : null,
   );
 
   String get displayCode => shipmentCode ?? id.substring(0, 8).toUpperCase();
@@ -95,8 +100,13 @@ class StatusUpdate {
   final DateTime createdAt;
 
   StatusUpdate({
-    required this.id, required this.shipmentId, required this.status,
-    this.note, this.city, this.updatedBy, required this.createdAt,
+    required this.id,
+    required this.shipmentId,
+    required this.status,
+    this.note,
+    this.city,
+    this.updatedBy,
+    required this.createdAt,
   });
 
   factory StatusUpdate.fromJson(Map<String, dynamic> json) => StatusUpdate(
