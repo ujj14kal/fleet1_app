@@ -22,21 +22,10 @@ class RoleSelectionScreen extends StatelessWidget {
               // Header ────────────────────────────────────────
               Row(
                 children: [
-                  Container(
-                    width: 44, height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryNavy,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '1',
-                        style: GoogleFonts.inter(
-                          fontSize: 22, fontWeight: FontWeight.w900,
-                          color: AppColors.white,
-                        ),
-                      ),
-                    ),
+                  Image.asset(
+                    'assets/images/logo_fleet1.png',
+                    width: 44,
+                    height: 44,
                   ),
                   const SizedBox(width: 12),
                   Row(
@@ -98,19 +87,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 onTap: () => context.go('/transporter/login'),
                 delay: 400,
               ),
-              const SizedBox(height: 16),
-              _RoleCard(
-                icon: Icons.drive_eta_rounded,
-                iconBg: AppColors.greenLight,
-                iconColor: AppColors.supportGreen,
-                title: 'Driver',
-                subtitle: 'Live tracking & delivery\nupdates on-the-go',
-                tag: 'COMING SOON',
-                tagColor: AppColors.supportGreen,
-                onTap: () => context.go('/driver/login'),
-                delay: 500,
-                comingSoon: true,
-              ),
+
 
               const Spacer(),
               Center(

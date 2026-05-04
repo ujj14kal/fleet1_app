@@ -47,24 +47,11 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo box ──────────────────────────────────────
-            Container(
+            // Logo ──────────────────────────────────────────
+            Image.asset(
+              'assets/images/logo_fleet1.png',
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 32,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: _Fleet1LogoMark(size: 56),
-              ),
             )
             .animate()
             .scale(
@@ -131,45 +118,3 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class _Fleet1LogoMark extends StatelessWidget {
-  final double size;
-  const _Fleet1LogoMark({required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    // The Fleet1 "1" mark — styled like the logo icon
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(painter: _LogoMarkPainter()),
-    );
-  }
-}
-
-class _LogoMarkPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primaryNavy
-      ..style = PaintingStyle.fill;
-
-    // Draw the Fleet1 "1" shape (bold stylized numeral 1 with a horizontal bar)
-    final path = Path();
-    final w = size.width;
-    final h = size.height;
-
-    // Vertical bar of the "1"
-    path.addRect(Rect.fromLTWH(w * 0.45, h * 0.15, w * 0.22, h * 0.70));
-
-    // Top-left notch (makes it look like "1")
-    path.addRect(Rect.fromLTWH(w * 0.25, h * 0.15, w * 0.20, h * 0.20));
-
-    // Bottom serif bar
-    path.addRect(Rect.fromLTWH(w * 0.22, h * 0.72, w * 0.55, h * 0.13));
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
