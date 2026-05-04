@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,184 +10,346 @@ class RoleSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 48),
+      backgroundColor: AppColors.primaryNavy,
+      body: Column(
+        children: [
+          // ── Hero / Top section ──────────────────────────────
+          SizedBox(
+            height: size.height * 0.40,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
 
-              // Header ────────────────────────────────────────
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/images/logo_fleet1.png',
-                    width: 44,
-                    height: 44,
-                  ),
-                  const SizedBox(width: 12),
-                  Row(
-                    children: [
-                      Text('FLEET', style: GoogleFonts.inter(
-                        fontSize: 22, fontWeight: FontWeight.w900,
-                        color: AppColors.primaryNavy, letterSpacing: 2,
-                      )),
-                      Text('1', style: GoogleFonts.inter(
-                        fontSize: 22, fontWeight: FontWeight.w900,
-                        color: AppColors.primaryAmber, letterSpacing: 2,
-                      )),
-                    ],
-                  ),
-                ],
-              ).animate().fade(duration: 400.ms).slideY(begin: -0.3, end: 0),
+                    // Logo + wordmark
+                    Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/logo_fleet1.png',
+                          width: 40,
+                          height: 40,
+                        ),
+                        const SizedBox(width: 10),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text('FLEET', style: GoogleFonts.inter(
+                              fontSize: 20, fontWeight: FontWeight.w900,
+                              color: Colors.white, letterSpacing: 2.5,
+                            )),
+                            Text('1', style: GoogleFonts.inter(
+                              fontSize: 20, fontWeight: FontWeight.w900,
+                              color: AppColors.primaryAmber, letterSpacing: 2.5,
+                            )),
+                          ],
+                        ),
+                      ],
+                    )
+                    .animate().fade(duration: 500.ms).slideY(begin: -0.2, end: 0, curve: Curves.easeOut),
 
-              const SizedBox(height: 48),
+                    const Spacer(),
 
-              Text(
-                'Welcome to\nFleet1',
-                style: GoogleFonts.inter(
-                  fontSize: 34, fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary, height: 1.15,
+                    // Big heading
+                    Text(
+                      'India\'s Smartest\nB2B Logistics.',
+                      style: GoogleFonts.inter(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.18,
+                        letterSpacing: -0.5,
+                      ),
+                    )
+                    .animate(delay: 150.ms)
+                    .fade(duration: 500.ms)
+                    .slideY(begin: 0.25, end: 0, curve: Curves.easeOut),
+
+                    const SizedBox(height: 10),
+
+                    // Subheading
+                    Text(
+                      'Choose your role to get started.',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Colors.white.withValues(alpha: 0.55),
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    )
+                    .animate(delay: 250.ms)
+                    .fade(duration: 500.ms),
+
+                    const SizedBox(height: 28),
+                  ],
                 ),
-              ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: 8),
-              Text(
-                'India\'s smartest B2B logistics platform.\nChoose how you use Fleet1.',
-                style: GoogleFonts.inter(
-                  fontSize: 14, color: AppColors.textSecondary, height: 1.5,
-                ),
-              ).animate(delay: 200.ms).fade(duration: 400.ms),
-
-              const SizedBox(height: 40),
-
-              // Role cards ─────────────────────────────────────
-              _RoleCard(
-                icon: Icons.factory_rounded,
-                iconBg: AppColors.navyLight,
-                iconColor: AppColors.primaryNavy,
-                title: 'Manufacturer',
-                subtitle: 'Book & track shipments\nfor your goods',
-                tag: 'SENDER',
-                tagColor: AppColors.primaryNavy,
-                onTap: () => context.go('/manufacturer/login'),
-                delay: 300,
               ),
-              const SizedBox(height: 16),
-              _RoleCard(
-                icon: Icons.local_shipping_rounded,
-                iconBg: AppColors.amberLight,
-                iconColor: AppColors.primaryAmber,
-                title: 'Transporter',
-                subtitle: 'Manage assignments\n& deliver shipments',
-                tag: 'CARRIER',
-                tagColor: AppColors.primaryAmber,
-                onTap: () => context.go('/transporter/login'),
-                delay: 400,
-              ),
-
-
-              const Spacer(),
-              Center(
-                child: Text(
-                  'By continuing you agree to our Terms of Service',
-                  style: GoogleFonts.inter(
-                    fontSize: 11, color: AppColors.textMuted,
-                  ),
-                ).animate(delay: 600.ms).fade(duration: 400.ms),
-              ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        ),
+
+          // ── Bottom sheet / Cards ────────────────────────────
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F7FB),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
+                child: Column(
+                  children: [
+                    // Pill handle
+                    Container(
+                      width: 36, height: 4,
+                      margin: const EdgeInsets.only(bottom: 28),
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+
+                    // Manufacturer card
+                    _RoleCard(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1F2F58), Color(0xFF2D4070)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      accentColor: AppColors.primaryAmber,
+                      icon: Icons.factory_rounded,
+                      label: 'Manufacturer',
+                      tag: 'SENDER',
+                      description: 'Book shipments, track deliveries\nand manage your logistics end-to-end.',
+                      onTap: () => context.go('/manufacturer/login'),
+                      delay: 350,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Transporter card
+                    _RoleCard(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF7A4A00), Color(0xFFBF7800)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      accentColor: Colors.white,
+                      icon: Icons.local_shipping_rounded,
+                      label: 'Transporter',
+                      tag: 'CARRIER',
+                      description: 'Accept assignments, dispatch\ntrucks and confirm deliveries.',
+                      onTap: () => context.go('/transporter/login'),
+                      delay: 450,
+                    ),
+
+                    const Spacer(),
+
+                    // Terms
+                    Text(
+                      'By continuing you agree to our Terms of Service & Privacy Policy',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                        height: 1.5,
+                      ),
+                    )
+                    .animate(delay: 600.ms)
+                    .fade(duration: 400.ms),
+
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _RoleCard extends StatelessWidget {
+// ── Role Card ──────────────────────────────────────────────
+class _RoleCard extends StatefulWidget {
+  final Gradient gradient;
+  final Color accentColor;
   final IconData icon;
-  final Color iconBg, iconColor;
-  final String title, subtitle, tag;
-  final Color tagColor;
+  final String label;
+  final String tag;
+  final String description;
   final VoidCallback onTap;
   final int delay;
-  final bool comingSoon;
 
   const _RoleCard({
-    required this.icon, required this.iconBg, required this.iconColor,
-    required this.title, required this.subtitle, required this.tag,
-    required this.tagColor, required this.onTap, required this.delay,
-    this.comingSoon = false,
+    required this.gradient,
+    required this.accentColor,
+    required this.icon,
+    required this.label,
+    required this.tag,
+    required this.description,
+    required this.onTap,
+    required this.delay,
   });
 
   @override
+  State<_RoleCard> createState() => _RoleCardState();
+}
+
+class _RoleCardState extends State<_RoleCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _press;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _press = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 200),
+    );
+    _scale = Tween<double>(begin: 1.0, end: 0.965).animate(
+      CurvedAnimation(parent: _press, curve: Curves.easeIn),
+    );
+  }
+
+  @override
+  void dispose() {
+    _press.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(_) {
+    HapticFeedback.lightImpact();
+    _press.forward();
+  }
+
+  void _onTapUp(_) {
+    _press.reverse();
+    widget.onTap();
+  }
+
+  void _onTapCancel() => _press.reverse();
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: comingSoon ? null : onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 52, height: 52,
-              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(14)),
-              child: Icon(icon, color: iconColor, size: 26),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(title, style: GoogleFonts.inter(
-                        fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary,
-                      )),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: tagColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(tag, style: GoogleFonts.inter(
-                          fontSize: 9, fontWeight: FontWeight.w800, color: tagColor,
-                          letterSpacing: 0.8,
-                        )),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: GoogleFonts.inter(
-                    fontSize: 12, color: AppColors.textMuted, height: 1.4,
-                  )),
-                ],
+    return AnimatedBuilder(
+      animation: _scale,
+      builder: (context, child) => Transform.scale(
+        scale: _scale.value,
+        child: child,
+      ),
+      child: GestureDetector(
+        onTapDown: _onTapDown,
+        onTapUp: _onTapUp,
+        onTapCancel: _onTapCancel,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            gradient: widget.gradient,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
-            ),
-            Icon(
-              comingSoon ? Icons.lock_outline_rounded : Icons.arrow_forward_ios_rounded,
-              color: comingSoon ? AppColors.textMuted : AppColors.primaryNavy,
-              size: 16,
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            children: [
+              // Icon bubble
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(widget.icon, color: Colors.white, size: 28),
+              ),
+
+              const SizedBox(width: 18),
+
+              // Text
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          widget.label,
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Text(
+                            widget.tag,
+                            style: GoogleFonts.inter(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      widget.description,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.70),
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // Arrow
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Colors.white,
+                  size: 17,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ).animate(delay: Duration(milliseconds: delay)).fade(duration: 400.ms).slideY(begin: 0.3, end: 0, curve: Curves.easeOut);
+    )
+    .animate(delay: Duration(milliseconds: widget.delay))
+    .fade(duration: 450.ms)
+    .slideY(begin: 0.35, end: 0, curve: Curves.easeOutCubic);
   }
 }
