@@ -48,10 +48,31 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo ──────────────────────────────────────────
-            Image.asset(
-              'assets/images/logo_fleet1.png',
-              width: 100,
-              height: 100,
+            Container(
+              width: 108,
+              height: 108,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    blurRadius: 40,
+                    spreadRadius: 8,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(10),
+              child: Image.asset(
+                'assets/images/logo_fleet1.png',
+                width: 88,
+                height: 88,
+              ),
             )
             .animate()
             .scale(

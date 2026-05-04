@@ -31,10 +31,26 @@ class RoleSelectionScreen extends StatelessWidget {
                     // Logo + wordmark
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/logo_fleet1.png',
-                          width: 40,
-                          height: 40,
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.25),
+                                blurRadius: 16,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: Image.asset(
+                            'assets/images/logo_fleet1.png',
+                            width: 36,
+                            height: 36,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Row(

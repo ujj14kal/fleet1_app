@@ -11,6 +11,7 @@ import '../../features/manufacturer/m_shell.dart';
 // Transporter tab screens re-exported from t_shell.dart
 import '../../features/transporter/t_shell.dart';
 import '../../features/driver/d_placeholder_screen.dart';
+import '../../features/manufacturer/screens/m_shipment_confirmation_screen.dart';
 
 final _rootKey = GlobalKey<NavigatorState>();
 
@@ -31,6 +32,21 @@ final appRouter = GoRouter(
 
     // ── Driver (placeholder) ──────────────────────────────
     GoRoute(path: '/driver/login', builder: (_, __) => const DPlaceholderScreen()),
+
+    // ── Shipment confirmation (outside shell) ─────────────
+    GoRoute(
+      path: '/m/confirm',
+      builder: (_, state) {
+        final extra = state.extra as Map<String, String>? ?? {};
+        return ShipmentConfirmationScreen(
+          shipmentCode:    extra['code']         ?? '',
+          pickupCity:      extra['pickupCity']   ?? '',
+          deliveryCity:    extra['deliveryCity'] ?? '',
+          goodsDescription: extra['goods']       ?? '',
+          loadType:        extra['loadType']     ?? '',
+        );
+      },
+    ),
 
     // ── Manufacturer shell with bottom nav ────────────────
     StatefulShellRoute.indexedStack(

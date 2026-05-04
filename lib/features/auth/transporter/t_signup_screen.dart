@@ -9,17 +9,17 @@ import '../../../shared/widgets/custom_text_field.dart';
 
 // Truck catalogue constant (matches web platform)
 const _truckCatalogue = [
-  {'id': 'tata_ace_7ft',   'name': 'Tata Ace • 7ft',     'cap': '750 kg',    'cap_kg': 750,   'category': 'part_load'},
-  {'id': 'bolero_8ft',     'name': 'Bolero • 8ft',        'cap': '1,000 kg',  'cap_kg': 1000,  'category': 'part_load'},
-  {'id': 'open_10ft',      'name': 'Open • 10ft',         'cap': '2,000 kg',  'cap_kg': 2000,  'category': 'part_load'},
-  {'id': 'open_14ft',      'name': 'Open • 14ft',         'cap': '4,000 kg',  'cap_kg': 4000,  'category': 'part_load'},
-  {'id': 'open_17ft',      'name': 'Open • 17ft',         'cap': '7,000 kg',  'cap_kg': 7000,  'category': 'full_load'},
-  {'id': 'open_20ft',      'name': 'Open • 20ft',         'cap': '10,000 kg', 'cap_kg': 10000, 'category': 'full_load'},
-  {'id': 'container_14ft', 'name': 'Container • 14ft',    'cap': '5,000 kg',  'cap_kg': 5000,  'category': 'full_load'},
-  {'id': 'container_20ft', 'name': 'Container • 20ft',    'cap': '10,000 kg', 'cap_kg': 10000, 'category': 'full_load'},
-  {'id': 'container_32ft', 'name': 'Container • 32ft',    'cap': '20,000 kg', 'cap_kg': 20000, 'category': 'full_load'},
-  {'id': 'trailer_20ft',   'name': 'Trailer • 20ft',      'cap': '15,000 kg', 'cap_kg': 15000, 'category': 'full_load'},
-  {'id': 'trailer_32ft',   'name': 'Trailer • 32ft',      'cap': '30,000 kg', 'cap_kg': 30000, 'category': 'full_load'},
+  {'id': 'tata_ace_7ft',   'name': 'Tata Ace • 7ft',     'cap': '750 kg',    'cap_kg': 750,   'category': 'part_load', 'img': 'assets/images/truck_mini.png'},
+  {'id': 'bolero_8ft',     'name': 'Bolero • 8ft',        'cap': '1,000 kg',  'cap_kg': 1000,  'category': 'part_load', 'img': 'assets/images/truck_mini.png'},
+  {'id': 'open_10ft',      'name': 'Open • 10ft',         'cap': '2,000 kg',  'cap_kg': 2000,  'category': 'part_load', 'img': 'assets/images/truck_mini.png'},
+  {'id': 'open_14ft',      'name': 'Open • 14ft',         'cap': '4,000 kg',  'cap_kg': 4000,  'category': 'part_load', 'img': 'assets/images/truck_large.png'},
+  {'id': 'open_17ft',      'name': 'Open • 17ft',         'cap': '7,000 kg',  'cap_kg': 7000,  'category': 'full_load', 'img': 'assets/images/truck_large.png'},
+  {'id': 'open_20ft',      'name': 'Open • 20ft',         'cap': '10,000 kg', 'cap_kg': 10000, 'category': 'full_load', 'img': 'assets/images/truck_large.png'},
+  {'id': 'container_14ft', 'name': 'Container • 14ft',    'cap': '5,000 kg',  'cap_kg': 5000,  'category': 'full_load', 'img': 'assets/images/truck_container.png'},
+  {'id': 'container_20ft', 'name': 'Container • 20ft',    'cap': '10,000 kg', 'cap_kg': 10000, 'category': 'full_load', 'img': 'assets/images/truck_container.png'},
+  {'id': 'container_32ft', 'name': 'Container • 32ft',    'cap': '20,000 kg', 'cap_kg': 20000, 'category': 'full_load', 'img': 'assets/images/truck_container.png'},
+  {'id': 'trailer_20ft',   'name': 'Trailer • 20ft',      'cap': '15,000 kg', 'cap_kg': 15000, 'category': 'full_load', 'img': 'assets/images/truck_trailer.png'},
+  {'id': 'trailer_32ft',   'name': 'Trailer • 32ft',      'cap': '30,000 kg', 'cap_kg': 30000, 'category': 'full_load', 'img': 'assets/images/truck_trailer.png'},
 ];
 
 const _allCities = [
@@ -227,54 +227,102 @@ class _TSignupScreenState extends State<TSignupScreen> {
     ],
   ]);
 
-  Widget _buildStep3() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text('Operating Routes', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-    const SizedBox(height: 4),
-    Text('Where do you operate from and deliver to?', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-    const SizedBox(height: 24),
-    Text('Base City (Pick-up city)', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-    const SizedBox(height: 8),
-    DropdownButtonFormField<String>(
-      value: _operatingFrom,
-      onChanged: (v) => setState(() => _operatingFrom = v),
-      decoration: InputDecoration(
-        filled: true, fillColor: AppColors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.textMuted),
+  Widget _buildStep3() {
+    final allSelected = _operatingCities.length == _allCities.length;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Operating Routes', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+      const SizedBox(height: 4),
+      Text('Where do you operate from and deliver to?', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+      const SizedBox(height: 24),
+      Text('Base City (Pick-up city)', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+      const SizedBox(height: 8),
+      DropdownButtonFormField<String>(
+        value: _operatingFrom,
+        onChanged: (v) => setState(() => _operatingFrom = v),
+        decoration: InputDecoration(
+          filled: true, fillColor: AppColors.white,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.textMuted),
+        ),
+        hint: Text('Select your base city', style: GoogleFonts.inter(color: AppColors.textMuted)),
+        items: _allCities.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
       ),
-      hint: Text('Select your base city', style: GoogleFonts.inter(color: AppColors.textMuted)),
-      items: _allCities.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-    ),
-    const SizedBox(height: 20),
-    Text('Operating Cities (Delivery destinations)', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-    const SizedBox(height: 4),
-    Text('Tap cities to select/deselect', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted)),
-    const SizedBox(height: 10),
-    Wrap(
-      spacing: 8, runSpacing: 8,
-      children: _allCities.map((city) {
-        final sel = _operatingCities.contains(city);
-        return GestureDetector(
-          onTap: () => setState(() => sel ? _operatingCities.remove(city) : _operatingCities.add(city)),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: sel ? AppColors.amberLight : AppColors.white,
-              borderRadius: BorderRadius.circular(100),
-              border: Border.all(color: sel ? AppColors.primaryAmber : AppColors.border),
-            ),
-            child: Text(city, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600,
-              color: sel ? AppColors.primaryAmber : AppColors.textSecondary)),
-          ),
-        );
-      }).toList(),
-    ),
-    if (_operatingCities.isNotEmpty) ...[
+      const SizedBox(height: 20),
+      Text('Operating Cities (Delivery destinations)', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
       const SizedBox(height: 10),
-      Text('${_operatingCities.length} cities selected', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryAmber)),
-    ],
-  ]);
+
+      // ── All India toggle ────────────────────────────────
+      GestureDetector(
+        onTap: () => setState(() {
+          if (allSelected) {
+            _operatingCities.clear();
+          } else {
+            _operatingCities.addAll(_allCities);
+          }
+        }),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            gradient: allSelected
+                ? const LinearGradient(colors: [Color(0xFF1F2F58), Color(0xFF2D4070)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                : null,
+            color: allSelected ? null : AppColors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: allSelected ? AppColors.primaryNavy : AppColors.border,
+              width: allSelected ? 0 : 1,
+            ),
+            boxShadow: allSelected ? [BoxShadow(color: AppColors.primaryNavy.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))] : [],
+          ),
+          child: Row(children: [
+            Text('🇮🇳', style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 14),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('All India', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w800, color: allSelected ? Colors.white : AppColors.textPrimary)),
+              Text(allSelected ? 'All ${_allCities.length} cities selected' : 'Operate across all of India — select all cities',
+                style: GoogleFonts.inter(fontSize: 12, color: allSelected ? Colors.white.withValues(alpha: 0.75) : AppColors.textSecondary)),
+            ])),
+            Container(
+              width: 26, height: 26,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: allSelected ? AppColors.primaryAmber : AppColors.border,
+              ),
+              child: Icon(allSelected ? Icons.check_rounded : Icons.add_rounded, color: Colors.white, size: 14),
+            ),
+          ]),
+        ),
+      ),
+
+      const SizedBox(height: 14),
+      Text('Or pick individual cities:', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted)),
+      const SizedBox(height: 8),
+      Wrap(
+        spacing: 8, runSpacing: 8,
+        children: _allCities.map((city) {
+          final sel = _operatingCities.contains(city);
+          return GestureDetector(
+            onTap: () => setState(() => sel ? _operatingCities.remove(city) : _operatingCities.add(city)),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: sel ? AppColors.amberLight : AppColors.white,
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: sel ? AppColors.primaryAmber : AppColors.border),
+              ),
+              child: Text(city, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600,
+                color: sel ? AppColors.primaryAmber : AppColors.textSecondary)),
+            ),
+          );
+        }).toList(),
+      ),
+      if (_operatingCities.isNotEmpty && !allSelected) ...[
+        const SizedBox(height: 10),
+        Text('${_operatingCities.length} cities selected', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryAmber)),
+      ],
+    ]);
+  }
 
   Widget _buildStep4() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Text('Your Fleet', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
@@ -283,7 +331,7 @@ class _TSignupScreenState extends State<TSignupScreen> {
     const SizedBox(height: 24),
     GridView.builder(
       shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 1.5, crossAxisSpacing: 12, mainAxisSpacing: 12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 1.45, crossAxisSpacing: 12, mainAxisSpacing: 12),
       itemCount: _truckCatalogue.length,
       itemBuilder: (_, i) {
         final t = _truckCatalogue[i];
@@ -292,18 +340,26 @@ class _TSignupScreenState extends State<TSignupScreen> {
         return GestureDetector(
           onTap: () => setState(() => sel ? _selectedTrucks.remove(id) : _selectedTrucks.add(id)),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: sel ? AppColors.amberLight : AppColors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: sel ? AppColors.primaryAmber : AppColors.border, width: sel ? 2 : 1),
             ),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.local_shipping_rounded, color: sel ? AppColors.primaryAmber : AppColors.textMuted, size: 28),
-              const SizedBox(height: 6),
-              Text(t['name'] as String, textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              Text(t['cap'] as String, style: GoogleFonts.inter(fontSize: 10, color: AppColors.textMuted)),
+              Expanded(
+                child: Image.asset(
+                  t['img'] as String,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Icon(Icons.local_shipping_rounded,
+                    color: sel ? AppColors.primaryAmber : AppColors.textMuted, size: 28),
+                ),
+              ),
               const SizedBox(height: 4),
+              Text(t['name'] as String, textAlign: TextAlign.center,
+                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              Text(t['cap'] as String, style: GoogleFonts.inter(fontSize: 9, color: AppColors.textMuted)),
+              const SizedBox(height: 3),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(

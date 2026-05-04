@@ -20,6 +20,31 @@ class ShipmentService {
     return ShipmentModel.fromJson(res);
   }
 
+  // ── Get available truck types with enough capacity ────────
+  /// Returns unique truck_type rows from the trucks table where
+  /// capacity_kg >= [minCapacityKg], sorted ascending by capacity.
+  static Future<List<Map<String, dynamic>>> getAvailableTrucksByCapacity(double minCapacityKg) async {
+    try {
+      final data = await _client
+          .from('trucks')
+          .select('truck_type, truck_label, capacity_kg')
+          .gte('capacity_kg', minCapacityKg.toInt())
+          .order('capacity_kg', ascending: true);
+      // Deduplicate by truck_type, keep one row per type
+      final seen = <String>{};
+      final result = <Map<String, dynamic>>[];
+      for (final row in (data as List)) {
+        final type = row['truck_type'] as String? ?? '';
+        if (type.isNotEmpty && seen.add(type)) {
+          result.add(Map<String, dynamic>.from(row as Map));
+        }
+      }
+      return result;
+    } catch (_) {
+      return [];
+    }
+  }
+
   // ── Get status updates for a shipment ─────────────────────
   static Future<List<StatusUpdate>> getStatusUpdates(String shipmentId) async {
     final data = await _client

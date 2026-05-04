@@ -11,6 +11,7 @@ import '../../../core/services/session_service.dart';
 import '../../../shared/widgets/fleet1_app_bar.dart';
 import '../../../shared/widgets/stat_card.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/truck_loader.dart';
 
 class MHomeTab extends StatefulWidget {
   const MHomeTab({super.key});
@@ -140,7 +141,10 @@ class _MHomeTabState extends State<MHomeTab> {
                 const SizedBox(height: 12),
 
                 if (_loading)
-                  const Center(child: CircularProgressIndicator(color: AppColors.primaryAmber))
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: TruckLoader(message: 'Fetching shipments...')),
+                  )
                 else if (recent.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(32),
