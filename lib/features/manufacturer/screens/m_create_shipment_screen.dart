@@ -11,6 +11,7 @@ import '../../../shared/widgets/fleet1_app_bar.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/truck_loader.dart';
+import '../../../shared/widgets/truck_asset_image.dart';
 import '../../../shared/constants/truck_catalogue.dart';
 
 const _allCities = [
@@ -1056,7 +1057,7 @@ class _TruckGrid extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 1.3,
+            childAspectRatio: 1.18,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
@@ -1127,13 +1128,13 @@ class _TruckGrid extends StatelessWidget {
                     else
                       const SizedBox(height: 18),
                     Expanded(
-                      child: Image.asset(
-                        img,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.local_shipping_rounded,
-                          color: AppColors.textMuted,
-                          size: 32,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: TruckAssetImage(
+                          asset: img,
+                          scale: 1.38,
+                          fallbackSize: 38,
+                          fallbackColor: AppColors.textMuted,
                         ),
                       ),
                     ),
