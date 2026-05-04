@@ -8,25 +8,36 @@ class StatusBadge extends StatelessWidget {
   const StatusBadge({super.key, required this.status});
 
   static const _statusMap = {
-    'pending':                   {'label': 'Pending',                    'color': 0xFFFFa800},
-    'assigned':                  {'label': 'Assigned',                   'color': 0xFF3B82F6},
-    'picked_up':                 {'label': 'Picked Up',                  'color': 0xFFFFa800},
-    'picked_up_by_ops':          {'label': 'Picked Up by Ops',           'color': 0xFFFFa800},
-    'in_transit':                {'label': 'In Transit',                 'color': 0xFF8B5CF6},
-    'in_transit_to_transporter': {'label': 'In Transit to Trp.',         'color': 0xFF8B5CF6},
-    'in_transit_to_receiver':    {'label': 'In Transit to Rcvr.',        'color': 0xFF8B5CF6},
-    'at_hub':                    {'label': 'At Hub',                     'color': 0xFF3B82F6},
-    'arrived_at_hub':            {'label': 'Arrived at Hub',             'color': 0xFF3B82F6},
-    'handover':                  {'label': 'Handover',                   'color': 0xFFFFa800},
-    'handed_to_transporter':     {'label': 'Handed to Transporter',      'color': 0xFF00BF63},
-    'delivered':                 {'label': 'Delivered',                  'color': 0xFF00BF63},
-    'cancelled':                 {'label': 'Cancelled',                  'color': 0xFFAF0000},
+    'pending': {'label': 'Pending', 'color': 0xFFFFa800},
+    'assigned': {'label': 'Assigned', 'color': 0xFF3B82F6},
+    'picked_up': {'label': 'Picked Up', 'color': 0xFFFFa800},
+    'picked_up_by_ops': {'label': 'Picked Up by Ops', 'color': 0xFFFFa800},
+    'in_transit': {'label': 'In Transit', 'color': 0xFF8B5CF6},
+    'in_transit_to_transporter': {
+      'label': 'In Transit to Trp.',
+      'color': 0xFF8B5CF6,
+    },
+    'in_transit_to_receiver': {
+      'label': 'In Transit to Rcvr.',
+      'color': 0xFF8B5CF6,
+    },
+    'at_hub': {'label': 'At Hub', 'color': 0xFF3B82F6},
+    'arrived_at_hub': {'label': 'Arrived at Hub', 'color': 0xFF3B82F6},
+    'handover': {'label': 'Handover', 'color': 0xFFFFa800},
+    'handed_to_transporter': {
+      'label': 'Handed to Transporter',
+      'color': 0xFF00BF63,
+    },
+    'delivered': {'label': 'Delivered', 'color': 0xFF00BF63},
+    'cancelled': {'label': 'Cancelled', 'color': 0xFFAF0000},
   };
 
   @override
   Widget build(BuildContext context) {
     final meta = _statusMap[status];
-    final label = meta != null ? meta['label'] as String : status.replaceAll('_', ' ').toUpperCase();
+    final label = meta != null
+        ? meta['label'] as String
+        : status.replaceAll('_', ' ').toUpperCase();
     final colorVal = meta != null ? meta['color'] as int : 0xFF94A3B8;
     final color = Color(colorVal);
 
@@ -39,7 +50,40 @@ class StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: color, letterSpacing: 0.2),
+        style: GoogleFonts.inter(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: color,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+class LoadTypeBadge extends StatelessWidget {
+  final String loadType;
+  const LoadTypeBadge({super.key, required this.loadType});
+
+  @override
+  Widget build(BuildContext context) {
+    final isPtl = loadType == 'part_load';
+    final color = isPtl ? const Color(0xFF3B82F6) : AppColors.supportGreen;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        isPtl ? 'PTL' : 'FTL',
+        style: GoogleFonts.inter(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: color,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
@@ -52,7 +96,13 @@ class StatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const StatCard({super.key, required this.value, required this.label, required this.icon, required this.color});
+  const StatCard({
+    super.key,
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,22 +112,48 @@ class StatCard extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
-        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(9)),
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(9),
+            ),
             child: Icon(icon, color: color, size: 16),
           ),
           const SizedBox(height: 8),
-          Text(value, style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+            ),
+          ),
           const SizedBox(height: 1),
           Flexible(
-            child: Text(label, style: GoogleFonts.inter(fontSize: 10, color: AppColors.textMuted, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis, maxLines: 2),
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
           ),
         ],
       ),
@@ -94,13 +170,17 @@ class ShipmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final code   = shipment['shipment_code'] ?? (shipment['id'] as String).substring(0, 8).toUpperCase();
+    final code =
+        shipment['shipment_code'] ??
+        (shipment['id'] as String).substring(0, 8).toUpperCase();
     final status = shipment['status'] as String? ?? 'pending';
-    final from   = shipment['pickup_city'] as String? ?? '—';
-    final to     = shipment['receiver_city'] as String? ?? '—';
-    final goods  = shipment['goods_description'] as String? ?? '—';
-    final qty    = shipment['quantity'];
-    final wt     = shipment['weight'];
+    final from = shipment['pickup_city'] as String? ?? '—';
+    final to = shipment['receiver_city'] as String? ?? '—';
+    final goods = shipment['goods_description'] as String? ?? '—';
+    final qty = shipment['quantity'];
+    final wt = shipment['weight'];
+    final loadType = shipment['load_type_required'] as String?;
+    final truckType = shipment['truck_type_required'] as String?;
 
     return GestureDetector(
       onTap: onTap,
@@ -110,38 +190,108 @@ class ShipmentCard extends StatelessWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
-          boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: const Offset(0, 2))],
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              Text(code, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primaryAmber, letterSpacing: 0.5)),
-              const Spacer(),
-              StatusBadge(status: status),
-            ]),
+            Row(
+              children: [
+                Text(
+                  code,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryAmber,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const Spacer(),
+                if (loadType != null) ...[
+                  LoadTypeBadge(loadType: loadType),
+                  const SizedBox(width: 6),
+                ],
+                StatusBadge(status: status),
+              ],
+            ),
             const SizedBox(height: 10),
             // Route
-            Row(children: [
-              const Icon(Icons.radio_button_checked, color: AppColors.primaryNavy, size: 14),
-              const SizedBox(width: 6),
-              Text(from, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(children: List.generate(4, (_) => Container(width: 4, height: 1.5, color: AppColors.border, margin: const EdgeInsets.only(right: 3)))),
-              ),
-              const Icon(Icons.location_on, color: AppColors.secondaryRed, size: 14),
-              const SizedBox(width: 6),
-              Text(to, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-            ]),
+            Row(
+              children: [
+                const Icon(
+                  Icons.radio_button_checked,
+                  color: AppColors.primaryNavy,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  from,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: List.generate(
+                      4,
+                      (_) => Container(
+                        width: 4,
+                        height: 1.5,
+                        color: AppColors.border,
+                        margin: const EdgeInsets.only(right: 3),
+                      ),
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.location_on,
+                  color: AppColors.secondaryRed,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  to,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 10),
             const Divider(height: 1, color: AppColors.divider),
             const SizedBox(height: 10),
-            Row(children: [
-              Expanded(child: _InfoChip(label: goods, icon: Icons.inventory_2_outlined)),
-              if (qty != null) _InfoChip(label: '$qty units', icon: Icons.numbers_rounded),
-              if (wt != null) _InfoChip(label: '${wt}kg', icon: Icons.scale_outlined),
-            ]),
+            Row(
+              children: [
+                Expanded(
+                  child: _InfoChip(
+                    label: goods,
+                    icon: Icons.inventory_2_outlined,
+                  ),
+                ),
+                if (qty != null)
+                  _InfoChip(label: '$qty units', icon: Icons.numbers_rounded),
+                if (wt != null)
+                  _InfoChip(label: '${wt}kg', icon: Icons.scale_outlined),
+              ],
+            ),
+            if (truckType != null && truckType.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              _InfoChip(
+                label: truckType.replaceAll('_', ' ').toUpperCase(),
+                icon: Icons.local_shipping_rounded,
+              ),
+            ],
           ],
         ),
       ),
@@ -155,12 +305,19 @@ class _InfoChip extends StatelessWidget {
   const _InfoChip({required this.label, required this.icon});
 
   @override
-  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-    Icon(icon, size: 12, color: AppColors.textMuted),
-    const SizedBox(width: 4),
-    Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted), overflow: TextOverflow.ellipsis),
-    const SizedBox(width: 12),
-  ]);
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 12, color: AppColors.textMuted),
+      const SizedBox(width: 4),
+      Text(
+        label,
+        style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted),
+        overflow: TextOverflow.ellipsis,
+      ),
+      const SizedBox(width: 12),
+    ],
+  );
 }
 
 // ── Section Header ────────────────────────────────────────
@@ -169,17 +326,42 @@ class SectionHeader extends StatelessWidget {
   final String? action;
   final VoidCallback? onAction;
 
-  const SectionHeader({super.key, required this.title, this.action, this.onAction});
+  const SectionHeader({
+    super.key,
+    required this.title,
+    this.action,
+    this.onAction,
+  });
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
-    child: Row(children: [
-      Text(title.toUpperCase(), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textMuted, letterSpacing: 0.8)),
-      const Spacer(),
-      if (action != null && onAction != null)
-        GestureDetector(onTap: onAction, child: Text(action!, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryNavy))),
-    ]),
+    child: Row(
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textMuted,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const Spacer(),
+        if (action != null && onAction != null)
+          GestureDetector(
+            onTap: onAction,
+            child: Text(
+              action!,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryNavy,
+              ),
+            ),
+          ),
+      ],
+    ),
   );
 }
 
@@ -190,26 +372,54 @@ class EmptyState extends StatelessWidget {
   final String? subtitle;
   final Widget? action;
 
-  const EmptyState({super.key, required this.icon, required this.title, this.subtitle, this.action});
+  const EmptyState({
+    super.key,
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.action,
+  });
 
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
       padding: const EdgeInsets.all(40),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          width: 72, height: 72,
-          decoration: BoxDecoration(color: AppColors.navyLight, shape: BoxShape.circle),
-          child: Icon(icon, color: AppColors.primaryNavy, size: 32),
-        ),
-        const SizedBox(height: 16),
-        Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary), textAlign: TextAlign.center),
-        if (subtitle != null) ...[
-          const SizedBox(height: 6),
-          Text(subtitle!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary), textAlign: TextAlign.center),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppColors.navyLight,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primaryNavy, size: 32),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              subtitle!,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+          if (action != null) ...[const SizedBox(height: 20), action!],
         ],
-        if (action != null) ...[const SizedBox(height: 20), action!],
-      ]),
+      ),
     ),
   );
 }

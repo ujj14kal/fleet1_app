@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,11 +25,26 @@ class _THomeTabState extends State<THomeTab> {
   TransporterModel? _transporter;
   List<Map<String, dynamic>> _assignments = [];
   bool _loading = true;
+  DateTime _now = DateTime.now();
+  Timer? _clockTimer;
 
   @override
   void initState() {
     super.initState();
+    _startClock();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startClock() {
+    _clockTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) setState(() => _now = DateTime.now());
+    });
   }
 
   Future<void> _load() async {
@@ -79,9 +96,11 @@ class _THomeTabState extends State<THomeTab> {
     final delivered = shipments.where((s) => s['status'] == 'delivered').length;
 
     final firstName = _profile?.fullName?.split(' ').first ?? '';
-    final h = DateTime.now().hour;
+    final h = _now.hour;
     final greeting = h < 12
-        ? 'Good morning'
+        ? h >= 5
+              ? 'Good morning'
+              : 'Good evening'
         : h < 17
         ? 'Good afternoon'
         : 'Good evening';
@@ -121,9 +140,7 @@ class _THomeTabState extends State<THomeTab> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                DateFormat(
-                                  'EEEE, d MMMM yyyy',
-                                ).format(DateTime.now()),
+                                DateFormat('EEEE, d MMMM yyyy').format(_now),
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   color: Colors.white.withValues(alpha: 0.6),

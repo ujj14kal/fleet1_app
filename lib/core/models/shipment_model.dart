@@ -88,6 +88,21 @@ class ShipmentModel {
   bool get isActive => status != 'delivered' && status != 'cancelled';
 
   bool get isDelivered => status == 'delivered';
+
+  String get loadTypeLabel {
+    if (loadTypeRequired == 'part_load') return 'PTL';
+    if (loadTypeRequired == 'full_load') return 'FTL';
+    return '—';
+  }
+
+  String get loadTypeFullLabel {
+    if (loadTypeRequired == 'part_load') return 'Part Load';
+    if (loadTypeRequired == 'full_load') return 'Full Truck';
+    return '—';
+  }
+
+  String get truckTypeLabel =>
+      truckTypeRequired?.replaceAll('_', ' ').toUpperCase() ?? '—';
 }
 
 class StatusUpdate {

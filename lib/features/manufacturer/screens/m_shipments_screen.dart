@@ -222,6 +222,10 @@ class _ShipmentListTile extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              if (shipment.loadTypeRequired != null) ...[
+                LoadTypeBadge(loadType: shipment.loadTypeRequired!),
+                const SizedBox(width: 6),
+              ],
               StatusBadge(status: shipment.status),
             ],
           ),
@@ -298,6 +302,30 @@ class _ShipmentListTile extends StatelessWidget {
               ),
             ],
           ),
+          if (shipment.truckTypeRequired != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(
+                  Icons.local_shipping_rounded,
+                  size: 12,
+                  color: AppColors.textMuted,
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Truck required: ${shipment.truckTypeLabel}',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
