@@ -25,23 +25,28 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 2800));
     if (!mounted) return;
 
-    final valid = await SessionService.isSessionValid();
-    if (valid) {
-      final profile = await AuthService.getCurrentProfile();
-      if (profile != null && mounted) {
-        switch (profile.role) {
-          case 'manufacturer':
-            context.go('/m/home');
-            return;
-          case 'transporter':
-            context.go('/t/home');
-            return;
-          default:
-            context.go('/role');
-            return;
+    try {
+      final valid = await SessionService.isSessionValid();
+      if (valid) {
+        final profile = await AuthService.getCurrentProfile();
+        if (profile != null && mounted) {
+          switch (profile.role) {
+            case 'manufacturer':
+              context.go('/m/home');
+              return;
+            case 'transporter':
+              context.go('/t/home');
+              return;
+            default:
+              context.go('/role');
+              return;
+          }
         }
       }
+    } catch (e) {
+      debugPrint('Splash navigation error: $e');
     }
+    
     if (mounted) context.go('/role');
   }
 
