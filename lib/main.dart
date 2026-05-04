@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config/supabase_config.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 
-void main() {
-  runApp(Fleet1App());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Lock to portrait mode
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+      autoRefreshToken: true,
+    ),
+  );
+
+  runApp(const Fleet1App());
 }
 
 class Fleet1App extends StatelessWidget {
@@ -9,29 +31,11 @@ class Fleet1App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MaterialApp.router(
       title: 'Fleet1',
-      home: HomeScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Fleet1"),
-      ),
-      body: Center(
-        child: Text(
-          "Welcome to Fleet1 🚖",
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      routerConfig: appRouter,
     );
   }
 }
