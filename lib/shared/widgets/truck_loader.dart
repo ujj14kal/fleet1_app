@@ -249,20 +249,6 @@ class _TruckRoadPainter extends CustomPainter {
     canvas.drawCircle(c, r * 0.62, _rimPaint);
     // hub
     canvas.drawCircle(c, r * 0.24, _hubPaint);
-
-    // rotating lug bolts
-    canvas.save();
-    canvas.translate(c.dx, c.dy);
-    canvas.rotate(t * 2 * math.pi);
-    for (int i = 0; i < 5; i++) {
-      final angle = (i / 5) * 2 * math.pi;
-      canvas.drawCircle(
-        Offset(math.cos(angle) * r * 0.40, math.sin(angle) * r * 0.40),
-        1.8,
-        _boltPaint,
-      );
-    }
-    canvas.restore();
   }
 
   void _paintFleet1(Canvas canvas, Offset center) {
