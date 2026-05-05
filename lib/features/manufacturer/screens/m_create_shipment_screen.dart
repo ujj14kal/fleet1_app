@@ -148,15 +148,6 @@ class _MCreateTabState extends State<MCreateTab> {
   });
 
   void _onWeightChanged(String _) {
-    final wt = double.tryParse(_weightCtrl.text.trim()) ?? 0;
-    if (wt <= 0) {
-      if (_loadType != null) setState(() => _loadType = null);
-    } else {
-      final recommended = wt < kFullLoadThresholdKg ? 'part_load' : 'full_load';
-      if (_loadType != recommended) {
-        setState(() => _loadType = recommended);
-      }
-    }
     _refreshTrucks();
   }
 
@@ -223,6 +214,67 @@ class _MCreateTabState extends State<MCreateTab> {
       );
       return;
     }
+
+    final wt = double.tryParse(_weightCtrl.text.trim()) ?? 0;
+    if (wt > 0) {
+      final recommended = wt < kFullLoadThresholdKg ? 'part_load' : 'full_load';
+      if (_loadType != recommended) {
+        final proceed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(
+              'Weight Warning',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryNavy,
+              ),
+            ),
+            content: Text(
+              _loadType == 'full_load'
+                  ? 'This weight (${wt.toStringAsFixed(0)} kg) is typically handled via Part Load. Are you sure you want to proceed with a Full Truck?'
+                  : 'This weight (${wt.toStringAsFixed(0)} kg) is typically handled via Full Truck. Are you sure you want to proceed with a Part Load?',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.textPrimary,
+                height: 1.4,
+              ),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(
+                  'Return to Home Screen',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(
+                  'Continue Anyway',
+                  style: GoogleFonts.inter(
+                    color: AppColors.primaryAmber,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        if (proceed == null || !proceed) {
+          if (proceed == false && mounted) {
+            context.go('/m/home');
+          }
+          return;
+        }
+      }
+    }
+
     setState(() {
       _loading = true;
       _error = null;
