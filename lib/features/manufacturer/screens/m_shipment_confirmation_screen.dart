@@ -156,23 +156,24 @@ class ShipmentConfirmationScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // Tracking note
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.amberLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.amberBorder),
-                    ),
-                    child: Row(children: [
-                      const Icon(Icons.location_on_rounded, color: AppColors.primaryAmber, size: 18),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(
-                        'Live map tracking will be available once a driver is assigned.',
-                        style: GoogleFonts.inter(fontSize: 12, color: AppColors.primaryAmber, fontWeight: FontWeight.w500),
-                      )),
-                    ]),
-                  )
-                  .animate(delay: 750.ms).fade(duration: 400.ms),
+                  if (loadType == 'full_load')
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.amberLight,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.amberBorder),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.location_on_rounded, color: AppColors.primaryAmber, size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(
+                          'Live map tracking will be available once a driver is assigned.',
+                          style: GoogleFonts.inter(fontSize: 12, color: AppColors.primaryAmber, fontWeight: FontWeight.w500),
+                        )),
+                      ]),
+                    )
+                    .animate(delay: 750.ms).fade(duration: 400.ms),
 
                   const SizedBox(height: 20),
 

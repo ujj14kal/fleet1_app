@@ -269,6 +269,55 @@ class _MTrackingTabState extends State<MTrackingTab> {
                               ),
                               const SizedBox(height: 16),
 
+                              if (_selected!.loadTypeRequired == 'full_load') ...[
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: AppColors.border),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.map_rounded, color: AppColors.primaryAmber, size: 16),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'LIVE MAP',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.textMuted,
+                                              letterSpacing: 0.8,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Container(
+                                        height: 140,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.navyLight,
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: AppColors.border),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Map tracking will be enabled once a driver is assigned.',
+                                            style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
                               // Timeline
                               Container(
                                 padding: const EdgeInsets.all(16),

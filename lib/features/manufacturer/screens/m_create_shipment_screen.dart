@@ -147,8 +147,13 @@ class _MCreateTabState extends State<MCreateTab> {
 
   void _onWeightChanged(String _) {
     final wt = double.tryParse(_weightCtrl.text.trim()) ?? 0;
-    if (wt > kFullLoadThresholdKg && _loadType == null) {
-      setState(() => _loadType = 'full_load');
+    if (wt <= 0) {
+      if (_loadType != null) setState(() => _loadType = null);
+    } else {
+      final recommended = wt < kFullLoadThresholdKg ? 'part_load' : 'full_load';
+      if (_loadType != recommended) {
+        setState(() => _loadType = recommended);
+      }
     }
     _refreshTrucks();
   }
@@ -290,85 +295,7 @@ class _MCreateTabState extends State<MCreateTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Load Type ─────────────────────────────────────
-            _Label('Load Type *'),
-            Row(
-              children: [
-                for (final lt in [
-                  {
-                    'id': 'part_load',
-                    'label': 'Part Load (PTL)',
-                    'icon': '📦',
-                    'desc': 'Share truck space',
-                  },
-                  {
-                    'id': 'full_load',
-                    'label': 'Full Truck (FTL)',
-                    'icon': '🚛',
-                    'desc': 'Entire truck booked',
-                  },
-                ])
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _loadType = lt['id'] as String;
-                            _selectedTruckId = null;
-                          });
-                          _refreshTrucks();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: _loadType == lt['id']
-                                ? (_loadType == 'full_load'
-                                      ? AppColors.amberLight
-                                      : AppColors.navyLight)
-                                : AppColors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: _loadType == lt['id']
-                                  ? (_loadType == 'full_load'
-                                        ? AppColors.primaryAmber
-                                        : AppColors.primaryNavy)
-                                  : AppColors.border,
-                              width: _loadType == lt['id'] ? 2 : 1,
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                lt['icon'] as String,
-                                style: const TextStyle(fontSize: 24),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lt['label'] as String,
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.textPrimary,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                lt['desc'] as String,
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  color: AppColors.textMuted,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+
 
             _WeightModeHint(
               weightKg: wt,
@@ -846,28 +773,6 @@ class _WeightModeHint extends StatelessWidget {
                 height: 1.35,
               ),
             ),
-            if (inBoundary || loadType != recommended) ...[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _ModeChoiceButton(
-                      label: 'Part Load',
-                      selected: loadType == 'part_load',
-                      onTap: () => onChoose('part_load'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _ModeChoiceButton(
-                      label: 'Full Truck',
-                      selected: loadType == 'full_load',
-                      onTap: () => onChoose('full_load'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ],
         ),
       ),
@@ -875,35 +780,6 @@ class _WeightModeHint extends StatelessWidget {
   }
 }
 
-class _ModeChoiceButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  const _ModeChoiceButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      height: 38,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? AppColors.primaryAmber : AppColors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: selected ? AppColors.primaryAmber : AppColors.border,
-        ),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-          color: AppColors.supportDark,
         ),
       ),
     ),
