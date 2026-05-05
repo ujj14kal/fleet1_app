@@ -163,7 +163,7 @@ class _MHomeTabState extends State<MHomeTab> {
                           child: _QuickBookBtn(
                             label: 'Create Shipment',
                             icon: Icons.add_box_rounded,
-                            onTap: () => context.go('/m/create'),
+                            onTap: () => context.go('/m/create?type=part_load'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -171,7 +171,7 @@ class _MHomeTabState extends State<MHomeTab> {
                           child: _QuickBookBtn(
                             label: 'Book Full Truck',
                             icon: Icons.local_shipping_rounded,
-                            onTap: () => context.go('/m/create'),
+                            onTap: () => context.go('/m/create?type=full_load'),
                             amber: false,
                           ),
                         ),

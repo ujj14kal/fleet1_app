@@ -59,7 +59,7 @@ final appRouter = GoRouter(
           GoRoute(path: '/m/shipments', builder: (_, __) => const MShipmentsTab()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/m/create',    builder: (_, __) => const MCreateTab()),
+          GoRoute(path: '/m/create',    builder: (_, state) => MCreateTab(initialLoadType: state.uri.queryParameters['type'])),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(path: '/m/tracking',  builder: (_, __) => const MTrackingTab()),

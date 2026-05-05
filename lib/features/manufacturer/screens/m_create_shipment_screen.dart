@@ -78,7 +78,8 @@ class SavedAddress {
 }
 
 class MCreateTab extends StatefulWidget {
-  const MCreateTab({super.key});
+  final String? initialLoadType;
+  const MCreateTab({super.key, this.initialLoadType});
   @override
   State<MCreateTab> createState() => _MCreateTabState();
 }
@@ -101,6 +102,7 @@ class _MCreateTabState extends State<MCreateTab> {
   @override
   void initState() {
     super.initState();
+    _loadType = widget.initialLoadType ?? 'part_load';
     _loadSavedAddresses();
   }
 
@@ -300,13 +302,6 @@ class _MCreateTabState extends State<MCreateTab> {
             _WeightModeHint(
               weightKg: wt,
               loadType: _loadType,
-              onChoose: (mode) {
-                setState(() {
-                  _loadType = mode;
-                  _selectedTruckId = null;
-                });
-                _refreshTrucks();
-              },
             ),
             if (_loadType != null) ...[
               const SizedBox(height: 12),
@@ -701,12 +696,10 @@ class _MCreateTabState extends State<MCreateTab> {
 class _WeightModeHint extends StatelessWidget {
   final double weightKg;
   final String? loadType;
-  final ValueChanged<String> onChoose;
 
   const _WeightModeHint({
     required this.weightKg,
     required this.loadType,
-    required this.onChoose,
   });
 
   @override
@@ -780,11 +773,7 @@ class _WeightModeHint extends StatelessWidget {
   }
 }
 
-        ),
-      ),
-    ),
-  );
-}
+
 
 class _ModeBanner extends StatelessWidget {
   final String loadType;
