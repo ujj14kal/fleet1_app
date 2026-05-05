@@ -1,4 +1,4 @@
-import Flutter
+// Removed import Flutter to avoid test target depending on Flutter module; tests should not import app frameworks unless needed.
 import UIKit
 import XCTest
 
