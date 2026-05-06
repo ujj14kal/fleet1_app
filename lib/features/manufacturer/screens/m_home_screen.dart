@@ -107,29 +107,31 @@ class _MHomeTabState extends State<MHomeTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${_greeting()}, ${name.isEmpty ? "there" : name} 👋',
-                                style: GoogleFonts.inter(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_greeting()}, ${name.isEmpty ? "there" : name} 👋',
+                              style: GoogleFonts.inter(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                DateFormat('EEEE, d MMMM yyyy').format(_now),
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat('EEEE, d MMMM yyyy').format(_now),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.white.withValues(alpha: 0.6),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         // Avatar
                         GestureDetector(
@@ -157,25 +159,27 @@ class _MHomeTabState extends State<MHomeTab> {
                     ),
                     const SizedBox(height: 20),
                     // Quick book buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _QuickBookBtn(
-                            label: 'Create Shipment',
-                            icon: Icons.add_box_rounded,
-                            onTap: () => context.go('/m/create?type=part_load'),
+                    IntrinsicHeight(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _QuickBookBtn(
+                              label: 'Create Shipment',
+                              icon: Icons.add_box_rounded,
+                              onTap: () => context.go('/m/create?type=part_load'),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _QuickBookBtn(
-                            label: 'Book Full Truck',
-                            icon: Icons.local_shipping_rounded,
-                            onTap: () => context.go('/m/create?type=full_load'),
-                            amber: false,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _QuickBookBtn(
+                              label: 'Book Full Truck',
+                              icon: Icons.local_shipping_rounded,
+                              amber: false,
+                              onTap: () => context.go('/m/create?type=full_load'),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -193,31 +197,35 @@ class _MHomeTabState extends State<MHomeTab> {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.5,
+                    childAspectRatio: 1.3,
                     children: [
                       StatCard(
                         value: '$active',
                         label: 'Active Shipments',
                         icon: Icons.inventory_2_rounded,
                         color: AppColors.primaryAmber,
+                        onTap: () => context.go('/m/shipments?tab=1'),
                       ),
                       StatCard(
                         value: '$inTransit',
                         label: 'In Transit',
                         icon: Icons.local_shipping_rounded,
-                        color: Color(0xFF8B5CF6),
+                        color: const Color(0xFF8B5CF6),
+                        onTap: () => context.go('/m/shipments?tab=1'),
                       ),
                       StatCard(
                         value: '$delivered',
                         label: 'Delivered',
                         icon: Icons.check_circle_rounded,
                         color: AppColors.supportGreen,
+                        onTap: () => context.go('/m/shipments?tab=2'),
                       ),
                       StatCard(
                         value: '$pending',
                         label: 'Pending Assignment',
                         icon: Icons.hourglass_top_rounded,
                         color: AppColors.secondaryRed,
+                        onTap: () => context.go('/m/shipments?tab=0'),
                       ),
                     ],
                   ),
@@ -225,6 +233,7 @@ class _MHomeTabState extends State<MHomeTab> {
                   const SizedBox(height: 28),
                   // Recent shipments
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'RECENT SHIPMENTS',
@@ -235,7 +244,6 @@ class _MHomeTabState extends State<MHomeTab> {
                           letterSpacing: 0.8,
                         ),
                       ),
-                      const Spacer(),
                       GestureDetector(
                         onTap: () => context.go('/m/shipments'),
                         child: Text(
@@ -359,36 +367,47 @@ class _QuickBookBtn extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-      decoration: BoxDecoration(
-        color: amber
-            ? AppColors.primaryAmber
-            : Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: amber ? AppColors.supportDark : Colors.white,
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: amber ? AppColors.supportDark : Colors.white,
+  Widget build(BuildContext context) {
+    final bgColor = amber
+        ? AppColors.primaryAmber
+        : Colors.white.withValues(alpha: 0.12);
+    final fgColor = amber
+        ? AppColors.supportDark
+        : Colors.white;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: fgColor,
+              size: 16,
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: fgColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ── Shipment Detail Bottom Sheet ──────────────────────────

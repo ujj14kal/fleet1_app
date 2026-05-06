@@ -107,6 +107,17 @@ class _MCreateTabState extends State<MCreateTab> {
   }
 
   @override
+  void didUpdateWidget(covariant MCreateTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialLoadType != oldWidget.initialLoadType && widget.initialLoadType != null) {
+      setState(() {
+        _loadType = widget.initialLoadType;
+      });
+      _refreshTrucks();
+    }
+  }
+
+  @override
   void dispose() {
     _goodsCtrl.dispose();
     _qtyCtrl.dispose();

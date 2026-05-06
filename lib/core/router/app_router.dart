@@ -56,7 +56,12 @@ final appRouter = GoRouter(
           GoRoute(path: '/m/home',      builder: (_, __) => const MHomeTab()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/m/shipments', builder: (_, __) => const MShipmentsTab()),
+          GoRoute(
+            path: '/m/shipments',
+            builder: (_, state) => MShipmentsTab(
+              initialTab: int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0,
+            ),
+          ),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(path: '/m/create',    builder: (_, state) => MCreateTab(initialLoadType: state.uri.queryParameters['type'])),
@@ -78,7 +83,12 @@ final appRouter = GoRouter(
           GoRoute(path: '/t/home',      builder: (_, __) => const THomeTab()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/t/assigned',  builder: (_, __) => const TAssignedTab()),
+          GoRoute(
+            path: '/t/assigned',
+            builder: (_, state) => TAssignedTab(
+              initialFilter: state.uri.queryParameters['filter'],
+            ),
+          ),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(path: '/t/handover',  builder: (_, __) => const THandoverTab()),

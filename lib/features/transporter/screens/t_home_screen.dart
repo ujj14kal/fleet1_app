@@ -125,29 +125,31 @@ class _THomeTabState extends State<THomeTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '$greeting, ${firstName.isEmpty ? "there" : firstName} 👋',
-                                style: GoogleFonts.inter(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$greeting, ${firstName.isEmpty ? "there" : firstName} 👋',
+                              style: GoogleFonts.inter(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                DateFormat('EEEE, d MMMM yyyy').format(_now),
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat('EEEE, d MMMM yyyy').format(_now),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.white.withValues(alpha: 0.6),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         GestureDetector(
                           onTap: () => context.go('/t/profile'),
@@ -229,31 +231,35 @@ class _THomeTabState extends State<THomeTab> {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.5,
+                    childAspectRatio: 1.3,
                     children: [
-                      StatCard(
+                       StatCard(
                         value: '${_assignments.length}',
                         label: 'Total Assigned',
                         icon: Icons.inventory_rounded,
                         color: AppColors.primaryAmber,
+                        onTap: () => context.go('/t/assigned'),
                       ),
                       StatCard(
                         value: '$inTransit',
                         label: 'In Transit',
                         icon: Icons.local_shipping_rounded,
                         color: const Color(0xFF8B5CF6),
+                        onTap: () => context.go('/t/assigned?filter=active'),
                       ),
                       StatCard(
                         value: '$delivered',
                         label: 'Delivered',
                         icon: Icons.check_circle_rounded,
                         color: AppColors.supportGreen,
+                        onTap: () => context.go('/t/assigned?filter=delivered'),
                       ),
                       StatCard(
                         value: '$active',
                         label: 'Active Now',
                         icon: Icons.inventory_2_rounded,
                         color: AppColors.primaryNavy,
+                        onTap: () => context.go('/t/assigned?filter=active'),
                       ),
                     ],
                   ),

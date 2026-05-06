@@ -12,7 +12,9 @@ import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/truck_loader.dart';
 
 class TAssignedTab extends StatefulWidget {
-  const TAssignedTab({super.key});
+  final String? initialFilter;
+  const TAssignedTab({super.key, this.initialFilter});
+
   @override
   State<TAssignedTab> createState() => _TAssignedTabState();
 }
@@ -20,9 +22,18 @@ class TAssignedTab extends StatefulWidget {
 class _TAssignedTabState extends State<TAssignedTab> {
   ProfileModel? _profile;
   TransporterModel? _transporter;
+  List<Map<String, dynamic>> _allAssignments = [];
   List<Map<String, dynamic>> _assignments = [];
   bool _loading = true;
   String? _updating;
+
+  @override
+  void didUpdateWidget(covariant TAssignedTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialFilter != widget.initialFilter) {
+      _applyFilter();
+    }
+  }
 
   @override
   void initState() {
@@ -45,11 +56,33 @@ class _TAssignedTabState extends State<TAssignedTab> {
       );
       if (mounted)
         setState(() {
-          _assignments = data;
+          _allAssignments = data;
+          _applyFilter();
           _loading = false;
         });
     } else {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _applyFilter() {
+    if (widget.initialFilter == null) {
+      _assignments = _allAssignments;
+      return;
+    }
+
+    if (widget.initialFilter == 'active') {
+      _assignments = _allAssignments.where((a) {
+        final s = a['shipments'] as Map<String, dynamic>?;
+        return s != null && s['status'] != 'delivered' && s['status'] != 'cancelled';
+      }).toList();
+    } else if (widget.initialFilter == 'delivered') {
+      _assignments = _allAssignments.where((a) {
+        final s = a['shipments'] as Map<String, dynamic>?;
+        return s != null && s['status'] == 'delivered';
+      }).toList();
+    } else {
+      _assignments = _allAssignments;
     }
   }
 

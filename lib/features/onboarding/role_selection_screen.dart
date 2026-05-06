@@ -117,71 +117,75 @@ class RoleSelectionScreen extends StatelessWidget {
                 color: Color(0xFFF5F7FB),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
               ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
-                child: Column(
-                  children: [
-                    // Pill handle
-                    Container(
-                      width: 36, height: 4,
-                      margin: const EdgeInsets.only(bottom: 28),
-                      decoration: BoxDecoration(
-                        color: AppColors.border,
-                        borderRadius: BorderRadius.circular(100),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Pill handle
+                      Container(
+                        width: 36, height: 4,
+                        margin: const EdgeInsets.only(bottom: 28),
+                        decoration: BoxDecoration(
+                          color: AppColors.border,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
                       ),
-                    ),
-
-                    // Manufacturer card
-                    _RoleCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1F2F58), Color(0xFF2D4070)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+  
+                      // Manufacturer card
+                      _RoleCard(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1F2F58), Color(0xFF2D4070)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        accentColor: AppColors.primaryAmber,
+                        icon: Icons.factory_rounded,
+                        label: 'Manufacturer',
+                        tag: 'SENDER',
+                        description: 'Book shipments, track deliveries\nand manage your logistics end-to-end.',
+                        onTap: () => context.go('/manufacturer/login'),
+                        delay: 350,
                       ),
-                      accentColor: AppColors.primaryAmber,
-                      icon: Icons.factory_rounded,
-                      label: 'Manufacturer',
-                      tag: 'SENDER',
-                      description: 'Book shipments, track deliveries\nand manage your logistics end-to-end.',
-                      onTap: () => context.go('/manufacturer/login'),
-                      delay: 350,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Transporter card
-                    _RoleCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF7A4A00), Color(0xFFBF7800)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+  
+                      const SizedBox(height: 16),
+  
+                      // Transporter card
+                      _RoleCard(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF7A4A00), Color(0xFFBF7800)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        accentColor: Colors.white,
+                        icon: Icons.local_shipping_rounded,
+                        label: 'Transporter',
+                        tag: 'CARRIER',
+                        description: 'Accept assignments, dispatch\ntrucks and confirm deliveries.',
+                        onTap: () => context.go('/transporter/login'),
+                        delay: 450,
                       ),
-                      accentColor: Colors.white,
-                      icon: Icons.local_shipping_rounded,
-                      label: 'Transporter',
-                      tag: 'CARRIER',
-                      description: 'Accept assignments, dispatch\ntrucks and confirm deliveries.',
-                      onTap: () => context.go('/transporter/login'),
-                      delay: 450,
-                    ),
-
-                    const Spacer(),
-
-                    // Terms
-                    Text(
-                      'By continuing you agree to our Terms of Service & Privacy Policy',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                        height: 1.5,
-                      ),
-                    )
-                    .animate(delay: 600.ms)
-                    .fade(duration: 400.ms),
-
-                    const SizedBox(height: 8),
-                  ],
+  
+                      const SizedBox(height: 32),
+  
+                      // Terms
+                      Text(
+                        'By continuing you agree to our Terms of Service & Privacy Policy',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                          height: 1.5,
+                        ),
+                      )
+                      .animate(delay: 600.ms)
+                      .fade(duration: 400.ms),
+  
+                      const SizedBox(height: 8),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -300,7 +304,10 @@ class _RoleCardState extends State<_RoleCard>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
                         Text(
                           widget.label,
@@ -311,7 +318,6 @@ class _RoleCardState extends State<_RoleCard>
                             letterSpacing: -0.2,
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(

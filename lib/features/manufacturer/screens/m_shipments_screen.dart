@@ -11,7 +11,9 @@ import '../../../shared/widgets/stat_card.dart';
 import '../../../shared/widgets/truck_loader.dart';
 
 class MShipmentsTab extends StatefulWidget {
-  const MShipmentsTab({super.key});
+  final int initialTab;
+  const MShipmentsTab({super.key, this.initialTab = 0});
+
   @override
   State<MShipmentsTab> createState() => _MShipmentsTabState();
 }
@@ -30,9 +32,22 @@ class _MShipmentsTabState extends State<MShipmentsTab>
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 3, vsync: this);
+    _tabCtrl = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTab,
+    );
     _tabCtrl.addListener(_applyFilter);
     _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant MShipmentsTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTab != widget.initialTab) {
+      _tabCtrl.index = widget.initialTab;
+      _applyFilter();
+    }
   }
 
   @override

@@ -95,6 +95,7 @@ class StatCard extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
+  final VoidCallback? onTap;
 
   const StatCard({
     super.key,
@@ -102,11 +103,14 @@ class StatCard extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -137,9 +141,10 @@ class StatCard extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.inter(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
+              height: 1.2,
             ),
           ),
           const SizedBox(height: 1),
@@ -157,8 +162,9 @@ class StatCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 // ── Shipment Card ─────────────────────────────────────────
