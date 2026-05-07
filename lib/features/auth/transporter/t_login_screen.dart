@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../shared/widgets/fleet1_app_bar.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../core/ui/platform_widgets.dart' show PlatformScaffold;
 import '../../../shared/widgets/custom_text_field.dart';
 
 class TLoginScreen extends StatefulWidget {
@@ -40,9 +41,9 @@ class _TLoginScreenState extends State<TLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: Fleet1AppBar(title: 'Transporter Login', onBack: () => context.go('/role')),
+    return PlatformScaffold(
+      title: 'Transporter Login',
+      onBack: () => context.go('/role'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(

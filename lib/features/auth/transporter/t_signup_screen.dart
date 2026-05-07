@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../shared/widgets/fleet1_app_bar.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../core/ui/platform_widgets.dart' show PlatformScaffold;
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/truck_asset_image.dart';
 
@@ -262,17 +263,14 @@ class _TSignupScreenState extends State<TSignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: Fleet1AppBar(
-        title: 'Join the Network',
-        onBack: _step > 0
-            ? () => setState(() {
-                _step--;
-                _error = null;
-              })
-            : () => context.go('/transporter/login'),
-      ),
+    return PlatformScaffold(
+      title: 'Join the Network',
+      onBack: _step > 0
+          ? () => setState(() {
+              _step--;
+              _error = null;
+            })
+          : () => context.go('/transporter/login'),
       body: Column(
         children: [
           // Progress bar

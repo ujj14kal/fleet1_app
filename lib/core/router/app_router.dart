@@ -12,6 +12,8 @@ import '../../features/manufacturer/m_shell.dart';
 import '../../features/transporter/t_shell.dart';
 import '../../features/driver/d_placeholder_screen.dart';
 import '../../features/manufacturer/screens/m_shipment_confirmation_screen.dart';
+import '../../features/demo/demo_ios_screen.dart';
+import '../../features/demo/demo_android_screen.dart';
 
 final _rootKey = GlobalKey<NavigatorState>();
 
@@ -101,5 +103,8 @@ final appRouter = GoRouter(
         ]),
       ],
     ),
+    // ── Demo preview routes (non-production) ──────────────
+    GoRoute(path: '/demo/ios', builder: (_, __) => const DemoIosScreen()),
+    GoRoute(path: '/demo/android', builder: (_, __) => const DemoAndroidScreen()),
   ],
 );

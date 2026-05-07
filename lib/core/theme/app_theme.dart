@@ -21,6 +21,16 @@ class AppTheme {
         brightness: Brightness.light,
       ),
       textTheme: GoogleFonts.interTextTheme(),
+      // Ensure Cupertino widgets follow the same brand styling on iOS
+      cupertinoOverrideTheme: CupertinoThemeData(
+        primaryColor: AppColors.primaryNavy,
+        scaffoldBackgroundColor: AppColors.background,
+        barBackgroundColor: AppColors.primaryNavy,
+        textTheme: CupertinoTextThemeData(
+          textStyle: GoogleFonts.inter(color: AppColors.textPrimary),
+          navTitleTextStyle: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.white),
+        ),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primaryNavy,
         foregroundColor: AppColors.white,

@@ -19,6 +19,14 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  // Ensure status bar and system overlays match the app's brand (dark icons on light backgrounds,
+  // light icons on dark app bars). Transparent background so app bars control color.
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+  ));
+
   await Supabase.initialize(
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
