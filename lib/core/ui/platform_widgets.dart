@@ -18,6 +18,8 @@ class PlatformScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_isCupertino) {
+      // Wrap body with a Material widget so Material-based widgets
+      // (TextField, TextFormField, etc.) work correctly on iOS.
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           backgroundColor: AppColors.primaryNavy,
@@ -28,7 +30,7 @@ class PlatformScaffold extends StatelessWidget {
           ) : null,
           trailing: Row(mainAxisSize: MainAxisSize.min, children: actions ?? []),
         ),
-        child: SafeArea(child: body),
+        child: SafeArea(child: Material(color: Colors.transparent, child: body)),
       );
     }
 
