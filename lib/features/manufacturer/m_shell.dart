@@ -41,6 +41,7 @@ class TShell extends StatelessWidget {
   static const _tabs = [
     _TabItem(icon: Icons.dashboard_rounded,       label: 'Home'),
     _TabItem(icon: Icons.inventory_rounded,       label: 'Assigned'),
+    _TabItem(icon: Icons.person_add_alt_1_rounded, label: 'Assign'),
     _TabItem(icon: Icons.swap_horiz_rounded,      label: 'Handover'),
     _TabItem(icon: Icons.local_shipping_rounded,  label: 'Fleet'),
     _TabItem(icon: Icons.person_rounded,          label: 'Profile'),

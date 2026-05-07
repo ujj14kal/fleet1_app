@@ -93,6 +93,9 @@ final appRouter = GoRouter(
           ),
         ]),
         StatefulShellBranch(routes: [
+          GoRoute(path: '/t/assign-driver', builder: (_, __) => const TAssignDriverTab()),
+        ]),
+        StatefulShellBranch(routes: [
           GoRoute(path: '/t/handover',  builder: (_, __) => const THandoverTab()),
         ]),
         StatefulShellBranch(routes: [

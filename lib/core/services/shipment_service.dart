@@ -134,4 +134,79 @@ class ShipmentService {
     final data = await _client.from('trucks').select('*').eq('transporter_id', transporterId);
     return List<Map<String, dynamic>>.from(data as List);
   }
+
+  // ── Find driver record by name or phone (search trucks/drivers records) ──
+  static Future<Map<String, dynamic>?> findDriverByNameOrPhone({String? name, String? phone}) async {
+    try {
+      if ((name == null || name.isEmpty) && (phone == null || phone.isEmpty)) return null;
+      // Prefer exact phone match when provided
+      if (phone != null && phone.isNotEmpty) {
+        final byPhone = await _client.from('drivers').select().eq('phone', phone).maybeSingle();
+        if (byPhone != null) return Map<String, dynamic>.from(byPhone as Map);
+      }
+      // Fallback to name search (case-insensitive) against drivers.full_name
+      if (name != null && name.isNotEmpty) {
+        final rows = await _client.from('drivers').select().ilike('full_name', '%${name.replaceAll('%', '\%')}%').limit(10);
+        if (rows != null && (rows as List).isNotEmpty) return Map<String, dynamic>.from(rows.first as Map);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ── Search drivers by name or phone, returning multiple matches ──
+  static Future<List<Map<String, dynamic>>> searchDrivers({String? name, String? phone, int limit = 20}) async {
+    try {
+      final results = <Map<String, dynamic>>[];
+      if (phone != null && phone.isNotEmpty) {
+        final byPhone = await _client.from('drivers').select().eq('phone', phone).maybeSingle();
+        if (byPhone != null) results.add(Map<String, dynamic>.from(byPhone as Map));
+      }
+      if (name != null && name.isNotEmpty) {
+        final rows = await _client.from('drivers').select().ilike('full_name', '%${name.replaceAll('%', '\%')}%').limit(limit);
+        if (rows != null) {
+          for (final r in rows as List) {
+            final map = Map<String, dynamic>.from(r as Map);
+            // avoid duplicate if same phone matched earlier
+            if (!results.any((e) => e['id'] == map['id'])) results.add(map);
+          }
+        }
+      }
+      return results;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // ── Assign driver details to a shipment and notify driver via DB insert ──
+  static Future<void> assignDriverToShipment({
+    required String shipmentId,
+    String? driverId,
+    String? driverName,
+    String? driverPhone,
+  }) async {
+    // Update shipment with driver details
+    await _client.from('shipments').update({
+      'driver_id': driverId,
+      'driver_name': driverName,
+      'driver_phone': driverPhone,
+      'status': 'assigned_to_driver',
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', shipmentId);
+
+    // Try inserting a notification row for drivers to pick up (best-effort)
+    try {
+      await _client.from('driver_notifications').insert({
+        'shipment_id': shipmentId,
+        'driver_id': driverId,
+        'driver_phone': driverPhone,
+        'driver_name': driverName,
+        'message': 'You have been assigned a shipment',
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    } catch (_) {
+      // ignore if notifications table doesn't exist
+    }
+  }
 }
