@@ -505,14 +505,25 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
       );
 
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
         Navigator.pop(context);
         widget.onAssigned();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              widget.isChange
+                  ? 'Driver changed successfully'
+                  : 'Driver assigned successfully',
+            ),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _submitting = false;
-          _error = 'Could not assign driver: ${e.toString()}';
+          _error =
+              '${widget.isChange ? 'Could not change driver' : 'Could not assign driver'}: ${e.toString().replaceFirst('Exception: ', '')}';
         });
       }
     }
@@ -1035,7 +1046,7 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                       : const Icon(Icons.check_rounded, size: 18),
                   label: Text(
                     _submitting
-                        ? 'Assigning...'
+                        ? (widget.isChange ? 'Changing...' : 'Assigning...')
                         : (widget.isChange
                               ? 'Confirm Change'
                               : 'Confirm Assignment'),

@@ -324,7 +324,7 @@ class ShipmentService {
   }
 
   // ── Assign driver details to a shipment ───────────────────
-  static Future<void> assignDriverToShipment({
+  static Future<Map<String, dynamic>> assignDriverToShipment({
     required String shipmentId,
     String? driverId,
     String? driverName,
@@ -334,26 +334,45 @@ class ShipmentService {
       throw Exception('Select a valid driver before assigning this shipment.');
     }
 
-    await _client
+    final cleanDriverId = driverId.trim();
+    final cleanDriverName = driverName?.trim() ?? '';
+    final cleanDriverPhone = driverPhone?.trim() ?? '';
+
+    final updated = await _client
         .from('shipments')
         .update({
-          'driver_id': driverId.trim(),
-          'driver_name': driverName?.trim(),
-          'driver_phone': driverPhone?.trim(),
+          'driver_id': cleanDriverId,
+          'driver_name': cleanDriverName.isEmpty ? null : cleanDriverName,
+          'driver_phone': cleanDriverPhone.isEmpty ? null : cleanDriverPhone,
           'status': 'assigned',
           'updated_at': DateTime.now().toIso8601String(),
         })
-        .eq('id', shipmentId);
+        .eq('id', shipmentId)
+        .select()
+        .maybeSingle();
+
+    if (updated == null) {
+      throw Exception(
+        'Shipment was not updated. Check transporter shipment update permissions.',
+      );
+    }
+
+    final persistedDriverId = updated['driver_id']?.toString().trim() ?? '';
+    if (persistedDriverId != cleanDriverId) {
+      throw Exception('Driver change did not persist in the database.');
+    }
 
     // Insert status update
     await _client.from('shipment_status_updates').insert({
       'shipment_id': shipmentId,
-      'updated_by': driverId.trim(),
+      'updated_by': cleanDriverId,
       'status': 'assigned',
-      'note': 'Driver assigned: ${driverName?.trim() ?? driverId.trim()}',
+      'note':
+          'Driver assigned: ${cleanDriverName.isEmpty ? cleanDriverId : cleanDriverName}',
     });
 
     // The driver app reads assigned rides directly from shipments.
+    return Map<String, dynamic>.from(updated);
   }
 
   static Future<void> saveDriverToTransporterList({
