@@ -51,9 +51,7 @@ class _TAssignedTabState extends State<TAssignedTab> {
         .maybeSingle();
     if (trpData != null) _transporter = TransporterModel.fromJson(trpData);
     if (_transporter != null) {
-      final data = await ShipmentService.getTransporterAssignments(
-        _transporter!.id,
-      );
+      final data = await ShipmentService.getTransporterAssignments(_transporter!.id);
       if (mounted)
         setState(() {
           _allAssignments = data;
@@ -70,7 +68,6 @@ class _TAssignedTabState extends State<TAssignedTab> {
       _assignments = _allAssignments;
       return;
     }
-
     if (widget.initialFilter == 'active') {
       _assignments = _allAssignments.where((a) {
         final s = a['shipments'] as Map<String, dynamic>?;
@@ -105,27 +102,27 @@ class _TAssignedTabState extends State<TAssignedTab> {
   }
 
   void _showStatusModal(BuildContext context, Map<String, dynamic> shipment) {
+    final currentStatus = shipment['status'] as String? ?? '';
+    // Lock: no further updates if delivered or cancelled
+    if (currentStatus == 'delivered' || currentStatus == 'cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            currentStatus == 'delivered'
+                ? 'This shipment has been delivered. No further updates allowed.'
+                : 'This shipment is cancelled.',
+          ),
+          backgroundColor: currentStatus == 'delivered' ? AppColors.supportGreen : AppColors.secondaryRed,
+        ),
+      );
+      return;
+    }
+
     final statuses = [
-      {
-        'id': 'picked_up',
-        'label': 'Picked Up',
-        'color': AppColors.primaryAmber,
-      },
-      {
-        'id': 'in_transit_to_receiver',
-        'label': 'In Transit',
-        'color': Color(0xFF8B5CF6),
-      },
-      {
-        'id': 'arrived_at_hub',
-        'label': 'Arrived at Hub',
-        'color': Color(0xFF3B82F6),
-      },
-      {
-        'id': 'delivered',
-        'label': 'Delivered',
-        'color': AppColors.supportGreen,
-      },
+      {'id': 'picked_up', 'label': 'Picked Up', 'color': AppColors.primaryAmber},
+      {'id': 'in_transit_to_receiver', 'label': 'In Transit', 'color': const Color(0xFF8B5CF6)},
+      {'id': 'arrived_at_hub', 'label': 'Arrived at Hub', 'color': const Color(0xFF3B82F6)},
+      {'id': 'delivered', 'label': 'Delivered', 'color': AppColors.supportGreen},
     ];
     final cityCtrl = TextEditingController();
     final noteCtrl = TextEditingController();
@@ -137,9 +134,7 @@ class _TAssignedTabState extends State<TAssignedTab> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModal) => Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           decoration: const BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -152,32 +147,42 @@ class _TAssignedTabState extends State<TAssignedTab> {
               children: [
                 Center(
                   child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.border,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
+                    width: 40, height: 4,
+                    decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(100)),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   'Update Shipment Status',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
                 ),
                 Text(
                   shipment['shipment_code'] ?? '',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: AppColors.primaryAmber,
-                    fontWeight: FontWeight.w700,
+                  style: GoogleFonts.inter(fontSize: 13, color: AppColors.primaryAmber, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                // Warning if marking delivered
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.amberLight,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.amberBorder),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.primaryAmber),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Once marked "Delivered", no further status changes will be allowed.',
+                          style: GoogleFonts.inter(fontSize: 11, color: AppColors.primaryAmber),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -185,28 +190,18 @@ class _TAssignedTabState extends State<TAssignedTab> {
                     final color = s['color'] as Color;
                     final sel = selectedStatus == s['id'] as String;
                     return GestureDetector(
-                      onTap: () =>
-                          setModal(() => selectedStatus = s['id'] as String),
+                      onTap: () => setModal(() => selectedStatus = s['id'] as String),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: sel
-                              ? color.withValues(alpha: 0.15)
-                              : AppColors.background,
+                          color: sel ? color.withValues(alpha: 0.15) : AppColors.background,
                           borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                            color: sel ? color : AppColors.border,
-                            width: sel ? 2 : 1,
-                          ),
+                          border: Border.all(color: sel ? color : AppColors.border, width: sel ? 2 : 1),
                         ),
                         child: Text(
                           s['label'] as String,
                           style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 12, fontWeight: FontWeight.w700,
                             color: sel ? color : AppColors.textSecondary,
                           ),
                         ),
@@ -221,23 +216,10 @@ class _TAssignedTabState extends State<TAssignedTab> {
                     hintText: 'Current city/location (optional)',
                     filled: true,
                     fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
-                    hintStyle: GoogleFonts.inter(
-                      color: AppColors.textMuted,
-                      fontSize: 13,
-                    ),
-                    prefixIcon: const Icon(
-                      Icons.location_on_outlined,
-                      size: 18,
-                      color: AppColors.textMuted,
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 13),
+                    prefixIcon: const Icon(Icons.location_on_outlined, size: 18, color: AppColors.textMuted),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -247,23 +229,14 @@ class _TAssignedTabState extends State<TAssignedTab> {
                     hintText: 'Notes (optional)',
                     filled: true,
                     fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
-                    hintStyle: GoogleFonts.inter(
-                      color: AppColors.textMuted,
-                      fontSize: 13,
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 13),
                   ),
                 ),
                 const SizedBox(height: 20),
                 PrimaryButton(
-                  label: 'Update Status',
+                  label: selectedStatus == 'delivered' ? '⚠️ Mark as Delivered (Final)' : 'Update Status',
                   onTap: selectedStatus == null
                       ? null
                       : () {
@@ -271,12 +244,8 @@ class _TAssignedTabState extends State<TAssignedTab> {
                           _updateStatus(
                             shipment['id'] as String,
                             selectedStatus!,
-                            cityCtrl.text.trim().isEmpty
-                                ? null
-                                : cityCtrl.text.trim(),
-                            noteCtrl.text.trim().isEmpty
-                                ? null
-                                : noteCtrl.text.trim(),
+                            cityCtrl.text.trim().isEmpty ? null : cityCtrl.text.trim(),
+                            noteCtrl.text.trim().isEmpty ? null : noteCtrl.text.trim(),
                           );
                         },
                   icon: Icons.check_rounded,
@@ -296,7 +265,7 @@ class _TAssignedTabState extends State<TAssignedTab> {
         .where((s) => s != null)
         .map((s) => s!)
         .toList();
-    final active = shipments.where((s) => s['status'] != 'delivered').toList();
+    final active = shipments.where((s) => s['status'] != 'delivered' && s['status'] != 'cancelled').length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -305,11 +274,7 @@ class _TAssignedTabState extends State<TAssignedTab> {
         elevation: 0,
         title: Text(
           'Assigned Shipments',
-          style: GoogleFonts.inter(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
+          style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w700, color: Colors.white),
         ),
         actions: [
           Container(
@@ -320,12 +285,8 @@ class _TAssignedTabState extends State<TAssignedTab> {
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
-              '${active.length} Active',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primaryAmber,
-              ),
+              '$active Active',
+              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.primaryAmber),
             ),
           ),
         ],
@@ -337,20 +298,10 @@ class _TAssignedTabState extends State<TAssignedTab> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.inbox_rounded,
-                    size: 48,
-                    color: AppColors.textMuted,
-                  ),
+                  const Icon(Icons.inbox_rounded, size: 48, color: AppColors.textMuted),
                   const SizedBox(height: 12),
-                  Text(
-                    'No assignments yet',
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
+                  Text('No assignments yet',
+                    style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                 ],
               ),
             )
@@ -364,12 +315,20 @@ class _TAssignedTabState extends State<TAssignedTab> {
                 itemBuilder: (_, i) {
                   final s = shipments[i];
                   final isUpdating = _updating == s['id'];
+                  final isDelivered = s['status'] == 'delivered';
+                  final isCancelled = s['status'] == 'cancelled';
+                  final isLocked = isDelivered || isCancelled;
+                  final driverName = s['driver_name']?.toString() ?? '';
+                  final driverPhone = s['driver_phone']?.toString() ?? '';
+
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: isDelivered ? AppColors.greenLight : AppColors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(
+                        color: isDelivered ? AppColors.greenBorder : AppColors.border,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,127 +336,133 @@ class _TAssignedTabState extends State<TAssignedTab> {
                         Row(
                           children: [
                             Text(
-                              s['shipment_code'] ??
-                                  (s['id'] as String)
-                                      .substring(0, 8)
-                                      .toUpperCase(),
+                              s['shipment_code'] ?? (s['id'] as String).substring(0, 8).toUpperCase(),
                               style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primaryAmber,
-                                letterSpacing: 0.5,
+                                fontSize: 13, fontWeight: FontWeight.w800,
+                                color: AppColors.primaryAmber, letterSpacing: 0.5,
                               ),
                             ),
                             const Spacer(),
-                            StatusBadge(
-                              status: s['status'] as String? ?? 'assigned',
-                            ),
+                            if (isDelivered)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.supportGreen.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.lock_rounded, size: 10, color: AppColors.supportGreen),
+                                    const SizedBox(width: 4),
+                                    Text('DELIVERED · LOCKED',
+                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w800, color: AppColors.supportGreen, letterSpacing: 0.5)),
+                                  ],
+                                ),
+                              )
+                            else
+                              StatusBadge(status: s['status'] as String? ?? 'assigned'),
                           ],
                         ),
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            const Icon(
-                              Icons.radio_button_checked,
-                              size: 12,
-                              color: AppColors.primaryNavy,
-                            ),
+                            const Icon(Icons.radio_button_checked, size: 12, color: AppColors.primaryNavy),
                             const SizedBox(width: 6),
-                            Text(
-                              s['pickup_city'] as String? ?? '—',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            Text(s['pickup_city'] as String? ?? '—',
+                              style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(
-                                Icons.arrow_forward_rounded,
-                                size: 14,
-                                color: AppColors.textMuted,
-                              ),
+                              child: Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.textMuted),
                             ),
-                            const Icon(
-                              Icons.location_on,
-                              size: 12,
-                              color: AppColors.secondaryRed,
-                            ),
+                            const Icon(Icons.location_on, size: 12, color: AppColors.secondaryRed),
                             const SizedBox(width: 6),
-                            Text(
-                              s['receiver_city'] as String? ?? '—',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            Text(s['receiver_city'] as String? ?? '—',
+                              style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         Row(
                           children: [
-                            const Icon(
-                              Icons.inventory_2_outlined,
-                              size: 12,
-                              color: AppColors.textMuted,
-                            ),
+                            const Icon(Icons.inventory_2_outlined, size: 12, color: AppColors.textMuted),
                             const SizedBox(width: 6),
                             Expanded(
-                              child: Text(
-                                s['goods_description'] as String? ?? '—',
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
+                              child: Text(s['goods_description'] as String? ?? '—',
+                                style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted)),
                             ),
                           ],
                         ),
+                        // Driver info
+                        if (driverName.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.person_rounded, size: 12, color: AppColors.primaryNavy),
+                              const SizedBox(width: 6),
+                              Text(driverName,
+                                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryNavy)),
+                              if (driverPhone.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Text('· $driverPhone',
+                                  style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted)),
+                              ],
+                            ],
+                          ),
+                        ],
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            if (s['quantity'] != null)
-                              _InfoPill('${s['quantity']} units'),
-                            if (s['weight'] != null)
-                              _InfoPill('${s['weight']} kg'),
+                            if (s['quantity'] != null) _InfoPill('${s['quantity']} units'),
+                            if (s['weight'] != null) _InfoPill('${s['weight']} kg'),
                             if (s['load_type_required'] != null)
-                              _InfoPill(
-                                s['load_type_required'] == 'part_load'
-                                    ? 'Part Load'
-                                    : 'Full Load',
-                              ),
+                              _InfoPill(s['load_type_required'] == 'part_load' ? 'Part Load' : 'Full Load'),
                             const Spacer(),
-                            SizedBox(
-                              height: 32,
-                              child: ElevatedButton(
-                                onPressed: isUpdating
-                                    ? null
-                                    : () => _showStatusModal(context, s),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryAmber,
-                                  foregroundColor: AppColors.supportDark,
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
+                            if (!isLocked)
+                              SizedBox(
+                                height: 32,
+                                child: ElevatedButton(
+                                  onPressed: isUpdating ? null : () => _showStatusModal(context, s),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryAmber,
+                                    foregroundColor: AppColors.supportDark,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                                  child: isUpdating
+                                      ? const TruckLoaderCompact(width: 72, height: 24)
+                                      : Text('Update Status',
+                                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700)),
                                 ),
-                                child: isUpdating
-                                    ? const TruckLoaderCompact(
-                                        width: 72,
-                                        height: 24,
-                                      )
-                                    : Text(
-                                        'Update Status',
+                              )
+                            else
+                              Container(
+                                height: 32,
+                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                                decoration: BoxDecoration(
+                                  color: isDelivered
+                                      ? AppColors.supportGreen.withValues(alpha: 0.12)
+                                      : AppColors.redLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.lock_rounded, size: 11,
+                                        color: isDelivered ? AppColors.supportGreen : AppColors.secondaryRed),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        isDelivered ? 'Delivered' : 'Cancelled',
                                         style: GoogleFonts.inter(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
+                                          fontSize: 11, fontWeight: FontWeight.w700,
+                                          color: isDelivered ? AppColors.supportGreen : AppColors.secondaryRed,
                                         ),
                                       ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ],
@@ -517,17 +482,7 @@ class _InfoPill extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(right: 6),
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-    decoration: BoxDecoration(
-      color: AppColors.navyLight,
-      borderRadius: BorderRadius.circular(100),
-    ),
-    child: Text(
-      label,
-      style: GoogleFonts.inter(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: AppColors.primaryNavy,
-      ),
-    ),
+    decoration: BoxDecoration(color: AppColors.navyLight, borderRadius: BorderRadius.circular(100)),
+    child: Text(label, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primaryNavy)),
   );
 }
