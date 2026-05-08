@@ -21,8 +21,6 @@ class ShipmentService {
   }
 
   // ── Get available truck types with enough capacity ────────
-  /// Returns unique truck_type rows from the trucks table where
-  /// capacity_kg >= [minCapacityKg], sorted ascending by capacity.
   static Future<List<Map<String, dynamic>>> getAvailableTrucksByCapacity(double minCapacityKg) async {
     try {
       final data = await _client
@@ -30,7 +28,6 @@ class ShipmentService {
           .select('truck_type, truck_label, capacity_kg')
           .gte('capacity_kg', minCapacityKg.toInt())
           .order('capacity_kg', ascending: true);
-      // Deduplicate by truck_type, keep one row per type
       final seen = <String>{};
       final result = <Map<String, dynamic>>[];
       for (final row in (data as List)) {
@@ -65,7 +62,9 @@ class ShipmentService {
     return List<Map<String, dynamic>>.from(data as List);
   }
 
-  // ── Update shipment status (Transporter) ──────────────────
+  // ── Update shipment status (Transporter — NOT delivered) ──
+  // Transporters can update status but CANNOT mark as delivered.
+  // Only drivers can mark as delivered.
   static Future<void> updateShipmentStatus({
     required String shipmentId,
     required String status,
@@ -73,12 +72,63 @@ class ShipmentService {
     String? note,
     String? city,
   }) async {
+    // Guard: transporters cannot mark delivered
+    if (status == 'delivered') {
+      throw Exception('Only drivers can mark a shipment as delivered.');
+    }
+
+    // Check if already delivered — no further updates allowed
+    final current = await _client
+        .from('shipments')
+        .select('status')
+        .eq('id', shipmentId)
+        .maybeSingle();
+    if (current != null && current['status'] == 'delivered') {
+      throw Exception('Shipment already delivered. No further updates allowed.');
+    }
+
     await _client.from('shipment_status_updates').insert({
-      'shipment_id': shipmentId, 'updated_by': updatedBy,
-      'status': status, 'note': note, 'city': city,
+      'shipment_id': shipmentId,
+      'updated_by': updatedBy,
+      'status': status,
+      'note': note,
+      'city': city,
     });
     await _client.from('shipments').update({
-      'status': status, 'updated_at': DateTime.now().toIso8601String(),
+      'status': status,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', shipmentId);
+  }
+
+  // ── Mark shipment as delivered (DRIVER ONLY) ──────────────
+  static Future<void> markDeliveredByDriver({
+    required String shipmentId,
+    required String driverId,
+  }) async {
+    // Verify shipment not already delivered
+    final current = await _client
+        .from('shipments')
+        .select('status, driver_id')
+        .eq('id', shipmentId)
+        .maybeSingle();
+
+    if (current == null) throw Exception('Shipment not found.');
+    if (current['status'] == 'delivered') {
+      throw Exception('Shipment already marked as delivered.');
+    }
+
+    // Insert status update
+    await _client.from('shipment_status_updates').insert({
+      'shipment_id': shipmentId,
+      'updated_by': driverId,
+      'status': 'delivered',
+      'note': 'Marked delivered by driver',
+    });
+
+    // Update shipment
+    await _client.from('shipments').update({
+      'status': 'delivered',
+      'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', shipmentId);
   }
 
@@ -135,78 +185,137 @@ class ShipmentService {
     return List<Map<String, dynamic>>.from(data as List);
   }
 
-  // ── Find driver record by name or phone (search trucks/drivers records) ──
-  static Future<Map<String, dynamic>?> findDriverByNameOrPhone({String? name, String? phone}) async {
+  // ── Search drivers — case-insensitive, matches name OR phone ──
+  // Returns list with a 'match_type' key: 'name', 'phone', or 'both'
+  static Future<List<Map<String, dynamic>>> searchDrivers({
+    String? name,
+    String? phone,
+    int limit = 30,
+  }) async {
     try {
-      if ((name == null || name.isEmpty) && (phone == null || phone.isEmpty)) return null;
-      // Prefer exact phone match when provided
-      if (phone != null && phone.isNotEmpty) {
-        final byPhone = await _client.from('drivers').select().eq('phone', phone).maybeSingle();
-        if (byPhone != null) return Map<String, dynamic>.from(byPhone as Map);
+      if ((name == null || name.trim().isEmpty) &&
+          (phone == null || phone.trim().isEmpty)) {
+        return [];
       }
-      // Fallback to name search (case-insensitive) against drivers.full_name
-      if (name != null && name.isNotEmpty) {
-        final rows = await _client.from('drivers').select().ilike('full_name', '%${name.replaceAll('%', '\%')}%').limit(10);
-        if (rows != null && (rows as List).isNotEmpty) return Map<String, dynamic>.from(rows.first as Map);
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
 
-  // ── Search drivers by name or phone, returning multiple matches ──
-  static Future<List<Map<String, dynamic>>> searchDrivers({String? name, String? phone, int limit = 20}) async {
-    try {
       final results = <Map<String, dynamic>>[];
-      if (phone != null && phone.isNotEmpty) {
-        final byPhone = await _client.from('drivers').select().eq('phone', phone).maybeSingle();
-        if (byPhone != null) results.add(Map<String, dynamic>.from(byPhone as Map));
-      }
-      if (name != null && name.isNotEmpty) {
-        final rows = await _client.from('drivers').select().ilike('full_name', '%${name.replaceAll('%', '\%')}%').limit(limit);
-        if (rows != null) {
-          for (final r in rows as List) {
-            final map = Map<String, dynamic>.from(r as Map);
-            // avoid duplicate if same phone matched earlier
-            if (!results.any((e) => e['id'] == map['id'])) results.add(map);
+      final seenIds = <String>{};
+
+      // ── Phone match (exact, trimmed) ──────────────────────
+      if (phone != null && phone.trim().isNotEmpty) {
+        final cleanPhone = phone.trim();
+        final byPhone = await _client
+            .from('drivers')
+            .select('id, full_name, phone, age')
+            .eq('phone', cleanPhone)
+            .limit(limit);
+        for (final r in byPhone as List) {
+          final map = Map<String, dynamic>.from(r as Map);
+          final id = map['id']?.toString() ?? '';
+          if (id.isNotEmpty && seenIds.add(id)) {
+            map['_match_type'] = 'phone';
+            results.add(map);
           }
         }
       }
+
+      // ── Name match (case-insensitive, partial) ────────────
+      if (name != null && name.trim().isNotEmpty) {
+        final cleanName = name.trim();
+        // Use ilike for case-insensitive LIKE
+        final byName = await _client
+            .from('drivers')
+            .select('id, full_name, phone, age')
+            .ilike('full_name', '%$cleanName%')
+            .limit(limit);
+        for (final r in byName as List) {
+          final map = Map<String, dynamic>.from(r as Map);
+          final id = map['id']?.toString() ?? '';
+          if (id.isNotEmpty) {
+            if (seenIds.contains(id)) {
+              // Already found by phone — upgrade match_type to 'both'
+              final idx = results.indexWhere((e) => e['id']?.toString() == id);
+              if (idx >= 0) results[idx]['_match_type'] = 'both';
+            } else {
+              seenIds.add(id);
+              map['_match_type'] = 'name';
+              results.add(map);
+            }
+          }
+        }
+      }
+
       return results;
-    } catch (_) {
+    } catch (e) {
       return [];
     }
   }
 
-  // ── Assign driver details to a shipment and notify driver via DB insert ──
+  // ── Assign driver details to a shipment ───────────────────
   static Future<void> assignDriverToShipment({
     required String shipmentId,
     String? driverId,
     String? driverName,
     String? driverPhone,
   }) async {
-    // Update shipment with driver details
     await _client.from('shipments').update({
       'driver_id': driverId,
       'driver_name': driverName,
       'driver_phone': driverPhone,
-      'status': 'assigned_to_driver',
+      'status': 'assigned',
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', shipmentId);
 
-    // Try inserting a notification row for drivers to pick up (best-effort)
+    // Insert status update
+    await _client.from('shipment_status_updates').insert({
+      'shipment_id': shipmentId,
+      'updated_by': driverId ?? driverName,
+      'status': 'assigned',
+      'note': 'Driver assigned: $driverName',
+    });
+
+    // Notify driver via driver_notifications table (best-effort)
     try {
       await _client.from('driver_notifications').insert({
         'shipment_id': shipmentId,
         'driver_id': driverId,
         'driver_phone': driverPhone,
         'driver_name': driverName,
-        'message': 'You have been assigned a shipment',
+        'message': 'You have been assigned a new shipment. Tap to view details.',
         'created_at': DateTime.now().toIso8601String(),
       });
+    } catch (_) {}
+  }
+
+  // ── Stream shipment for a driver (real-time) ──────────────
+  static Stream<List<Map<String, dynamic>>> streamDriverShipments(String driverId) {
+    if (driverId.isEmpty) return const Stream.empty();
+    return _client
+        .from('shipments')
+        .stream(primaryKey: ['id'])
+        .eq('driver_id', driverId)
+        .map((rows) => List<Map<String, dynamic>>.from(rows));
+  }
+
+  // ── Stream single shipment (real-time updates) ────────────
+  static Stream<Map<String, dynamic>?> streamShipment(String shipmentId) {
+    return _client
+        .from('shipments')
+        .stream(primaryKey: ['id'])
+        .eq('id', shipmentId)
+        .map((rows) => rows.isEmpty ? null : Map<String, dynamic>.from(rows.first));
+  }
+
+  // ── Find driver by ID (for navigation details) ───────────
+  static Future<Map<String, dynamic>?> getDriverById(String driverId) async {
+    try {
+      return await _client
+          .from('drivers')
+          .select('id, full_name, phone, age')
+          .eq('id', driverId)
+          .maybeSingle();
     } catch (_) {
-      // ignore if notifications table doesn't exist
+      return null;
     }
   }
 }
