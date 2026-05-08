@@ -5,7 +5,9 @@ class ShipmentService {
   static final _client = Supabase.instance.client;
 
   // ── Manufacturer: get all shipments ───────────────────────
-  static Future<List<ShipmentModel>> getManufacturerShipments(String userId) async {
+  static Future<List<ShipmentModel>> getManufacturerShipments(
+    String userId,
+  ) async {
     final data = await _client
         .from('shipments')
         .select('*')
@@ -15,13 +17,21 @@ class ShipmentService {
   }
 
   // ── Manufacturer: create shipment ─────────────────────────
-  static Future<ShipmentModel?> createShipment(Map<String, dynamic> payload) async {
-    final res = await _client.from('shipments').insert(payload).select().single();
+  static Future<ShipmentModel?> createShipment(
+    Map<String, dynamic> payload,
+  ) async {
+    final res = await _client
+        .from('shipments')
+        .insert(payload)
+        .select()
+        .single();
     return ShipmentModel.fromJson(res);
   }
 
   // ── Get available truck types with enough capacity ────────
-  static Future<List<Map<String, dynamic>>> getAvailableTrucksByCapacity(double minCapacityKg) async {
+  static Future<List<Map<String, dynamic>>> getAvailableTrucksByCapacity(
+    double minCapacityKg,
+  ) async {
     try {
       final data = await _client
           .from('trucks')
@@ -53,7 +63,9 @@ class ShipmentService {
   }
 
   // ── Transporter: get assigned shipments ───────────────────
-  static Future<List<Map<String, dynamic>>> getTransporterAssignments(String transporterId) async {
+  static Future<List<Map<String, dynamic>>> getTransporterAssignments(
+    String transporterId,
+  ) async {
     final data = await _client
         .from('shipment_assignments')
         .select('*, shipments(*)')
@@ -84,7 +96,9 @@ class ShipmentService {
         .eq('id', shipmentId)
         .maybeSingle();
     if (current != null && current['status'] == 'delivered') {
-      throw Exception('Shipment already delivered. No further updates allowed.');
+      throw Exception(
+        'Shipment already delivered. No further updates allowed.',
+      );
     }
 
     await _client.from('shipment_status_updates').insert({
@@ -94,10 +108,13 @@ class ShipmentService {
       'note': note,
       'city': city,
     });
-    await _client.from('shipments').update({
-      'status': status,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', shipmentId);
+    await _client
+        .from('shipments')
+        .update({
+          'status': status,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', shipmentId);
   }
 
   // ── Mark shipment as delivered (DRIVER ONLY) ──────────────
@@ -126,10 +143,13 @@ class ShipmentService {
     });
 
     // Update shipment
-    await _client.from('shipments').update({
-      'status': 'delivered',
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', shipmentId);
+    await _client
+        .from('shipments')
+        .update({
+          'status': 'delivered',
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', shipmentId);
   }
 
   // ── Create handover ───────────────────────────────────────
@@ -149,25 +169,35 @@ class ShipmentService {
       'goods_condition': goodsCondition,
       'remarks': remarks,
     });
-    await _client.from('shipments').update({
-      'current_transporter_id': toTransporterId,
-      'status': 'handed_to_transporter',
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', shipmentId);
+    await _client
+        .from('shipments')
+        .update({
+          'current_transporter_id': toTransporterId,
+          'status': 'handed_to_transporter',
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', shipmentId);
   }
 
   // ── Get all transporters (for handover selection) ─────────
   static Future<List<Map<String, dynamic>>> getAllTransporters() async {
-    final data = await _client.from('transporters').select('*').eq('is_active', true);
+    final data = await _client
+        .from('transporters')
+        .select('*')
+        .eq('is_active', true);
     return List<Map<String, dynamic>>.from(data as List);
   }
 
   // ── Get transporter handovers ─────────────────────────────
-  static Future<List<Map<String, dynamic>>> getHandovers(String transporterId) async {
+  static Future<List<Map<String, dynamic>>> getHandovers(
+    String transporterId,
+  ) async {
     final data = await _client
         .from('handovers')
         .select('*')
-        .or('from_transporter_id.eq.$transporterId,to_transporter_id.eq.$transporterId')
+        .or(
+          'from_transporter_id.eq.$transporterId,to_transporter_id.eq.$transporterId',
+        )
         .order('created_at', ascending: false);
     return List<Map<String, dynamic>>.from(data as List);
   }
@@ -175,80 +205,122 @@ class ShipmentService {
   // ── Fetch transporter info for a shipment ─────────────────
   static Future<Map<String, dynamic>?> getTransporterById(String? trpId) async {
     if (trpId == null) return null;
-    final data = await _client.from('transporters').select().eq('id', trpId).maybeSingle();
+    final data = await _client
+        .from('transporters')
+        .select()
+        .eq('id', trpId)
+        .maybeSingle();
     return data;
   }
 
   // ── Fetch trucks for transporter ──────────────────────────
-  static Future<List<Map<String, dynamic>>> getTrucksForTransporter(String transporterId) async {
-    final data = await _client.from('trucks').select('*').eq('transporter_id', transporterId);
+  static Future<List<Map<String, dynamic>>> getTrucksForTransporter(
+    String transporterId,
+  ) async {
+    final data = await _client
+        .from('trucks')
+        .select('*')
+        .eq('transporter_id', transporterId);
     return List<Map<String, dynamic>>.from(data as List);
   }
 
-  // ── Search drivers — case-insensitive, matches name OR phone ──
-  // Returns list with a 'match_type' key: 'name', 'phone', or 'both'
+  static Future<String?> getCurrentTransporterId() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return null;
+
+    final transporter = await _client
+        .from('transporters')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+    return transporter?['id']?.toString();
+  }
+
+  // ── Search drivers — case-insensitive name, normalized phone ──
+  // Returns list with '_match_type' and '_phone_exact_match' UI helpers.
   static Future<List<Map<String, dynamic>>> searchDrivers({
     String? name,
     String? phone,
     int limit = 30,
   }) async {
-    try {
-      if ((name == null || name.trim().isEmpty) &&
-          (phone == null || phone.trim().isEmpty)) {
-        return [];
-      }
-
-      final results = <Map<String, dynamic>>[];
-      final seenIds = <String>{};
-
-      // ── Phone match (exact, trimmed) ──────────────────────
-      if (phone != null && phone.trim().isNotEmpty) {
-        final cleanPhone = phone.trim();
-        final byPhone = await _client
-            .from('drivers')
-            .select('id, full_name, phone, age')
-            .eq('phone', cleanPhone)
-            .limit(limit);
-        for (final r in byPhone as List) {
-          final map = Map<String, dynamic>.from(r as Map);
-          final id = map['id']?.toString() ?? '';
-          if (id.isNotEmpty && seenIds.add(id)) {
-            map['_match_type'] = 'phone';
-            results.add(map);
-          }
-        }
-      }
-
-      // ── Name match (case-insensitive, partial) ────────────
-      if (name != null && name.trim().isNotEmpty) {
-        final cleanName = name.trim();
-        // Use ilike for case-insensitive LIKE
-        final byName = await _client
-            .from('drivers')
-            .select('id, full_name, phone, age')
-            .ilike('full_name', '%$cleanName%')
-            .limit(limit);
-        for (final r in byName as List) {
-          final map = Map<String, dynamic>.from(r as Map);
-          final id = map['id']?.toString() ?? '';
-          if (id.isNotEmpty) {
-            if (seenIds.contains(id)) {
-              // Already found by phone — upgrade match_type to 'both'
-              final idx = results.indexWhere((e) => e['id']?.toString() == id);
-              if (idx >= 0) results[idx]['_match_type'] = 'both';
-            } else {
-              seenIds.add(id);
-              map['_match_type'] = 'name';
-              results.add(map);
-            }
-          }
-        }
-      }
-
-      return results;
-    } catch (e) {
+    if ((name == null || name.trim().isEmpty) &&
+        (phone == null || phone.trim().isEmpty)) {
       return [];
     }
+
+    final cleanName = name?.trim().toLowerCase();
+    final cleanPhone = phone?.trim();
+    final normalizedPhone = _digitsOnly(cleanPhone ?? '');
+
+    final rowsById = <String, Map<String, dynamic>>{};
+    final driverRows = await _client.from('drivers').select('*').limit(250);
+    for (final row in driverRows as List) {
+      final driver = Map<String, dynamic>.from(row as Map);
+      final id = driver['id']?.toString() ?? '';
+      if (id.isNotEmpty) rowsById[id] = driver;
+    }
+
+    final profileRows = await _client
+        .from('profiles')
+        .select('*')
+        .eq('role', 'driver')
+        .limit(250);
+    for (final row in profileRows as List) {
+      final profile = Map<String, dynamic>.from(row as Map);
+      final id = profile['id']?.toString() ?? '';
+      if (id.isEmpty) continue;
+      rowsById[id] = {
+        ...profile,
+        ...?rowsById[id],
+        'id': id,
+        'full_name': rowsById[id]?['full_name'] ?? profile['full_name'],
+        'phone': rowsById[id]?['phone'] ?? profile['phone'],
+      };
+    }
+
+    final results = rowsById.values.where((driver) {
+      final driverName = _driverName(driver).toLowerCase();
+      final driverPhone = _digitsOnly(_driverPhone(driver));
+      final nameMatches =
+          cleanName != null &&
+          cleanName.isNotEmpty &&
+          driverName.contains(cleanName);
+      final phoneMatches =
+          normalizedPhone.isNotEmpty && driverPhone == normalizedPhone;
+      final phonePartialMatches =
+          normalizedPhone.isNotEmpty &&
+          driverPhone.isNotEmpty &&
+          (driverPhone.contains(normalizedPhone) ||
+              normalizedPhone.contains(driverPhone));
+
+      if (!nameMatches && !phoneMatches && !phonePartialMatches) {
+        return false;
+      }
+
+      driver['_match_type'] =
+          nameMatches && (phoneMatches || phonePartialMatches)
+          ? 'both'
+          : nameMatches
+          ? 'name'
+          : 'phone';
+      driver['_phone_exact_match'] = phoneMatches;
+      return true;
+    }).toList();
+
+    results.sort((a, b) {
+      final aPhone = a['_phone_exact_match'] == true ? 0 : 1;
+      final bPhone = b['_phone_exact_match'] == true ? 0 : 1;
+      if (aPhone != bPhone) return aPhone.compareTo(bPhone);
+
+      final aBoth = a['_match_type'] == 'both' ? 0 : 1;
+      final bBoth = b['_match_type'] == 'both' ? 0 : 1;
+      if (aBoth != bBoth) return aBoth.compareTo(bBoth);
+
+      return _driverName(
+        a,
+      ).toLowerCase().compareTo(_driverName(b).toLowerCase());
+    });
+    return results.take(limit).toList();
   }
 
   // ── Assign driver details to a shipment ───────────────────
@@ -258,37 +330,83 @@ class ShipmentService {
     String? driverName,
     String? driverPhone,
   }) async {
-    await _client.from('shipments').update({
-      'driver_id': driverId,
-      'driver_name': driverName,
-      'driver_phone': driverPhone,
-      'status': 'assigned',
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', shipmentId);
+    if (driverId == null || driverId.trim().isEmpty) {
+      throw Exception('Select a valid driver before assigning this shipment.');
+    }
+
+    await _client
+        .from('shipments')
+        .update({
+          'driver_id': driverId.trim(),
+          'driver_name': driverName?.trim(),
+          'driver_phone': driverPhone?.trim(),
+          'status': 'assigned',
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', shipmentId);
 
     // Insert status update
     await _client.from('shipment_status_updates').insert({
       'shipment_id': shipmentId,
-      'updated_by': driverId ?? driverName,
+      'updated_by': driverId.trim(),
       'status': 'assigned',
-      'note': 'Driver assigned: $driverName',
+      'note': 'Driver assigned: ${driverName?.trim() ?? driverId.trim()}',
     });
 
-    // Notify driver via driver_notifications table (best-effort)
-    try {
-      await _client.from('driver_notifications').insert({
-        'shipment_id': shipmentId,
-        'driver_id': driverId,
-        'driver_phone': driverPhone,
-        'driver_name': driverName,
-        'message': 'You have been assigned a new shipment. Tap to view details.',
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    } catch (_) {}
+    // The driver app reads assigned rides directly from shipments.
   }
 
+  static Future<void> saveDriverToTransporterList({
+    required String driverId,
+    required String transporterId,
+  }) async {
+    final driver = await _client
+        .from('drivers')
+        .select('id, transporter_id')
+        .eq('id', driverId)
+        .maybeSingle();
+
+    if (driver == null) {
+      throw Exception('Driver record not found.');
+    }
+
+    final currentTransporterId = driver['transporter_id']?.toString().trim();
+    if (currentTransporterId != null && currentTransporterId.isNotEmpty) {
+      if (currentTransporterId == transporterId) return;
+      throw Exception('This driver is already saved by another transporter.');
+    }
+
+    await _client
+        .from('drivers')
+        .update({'transporter_id': transporterId})
+        .eq('id', driverId);
+  }
+
+  static String _digitsOnly(String value) =>
+      value.replaceAll(RegExp(r'\D'), '');
+
+  static String _driverName(Map<String, dynamic> driver) =>
+      (driver['full_name'] ??
+              driver['fullName'] ??
+              driver['name'] ??
+              driver['driver_name'] ??
+              '')
+          .toString()
+          .trim();
+
+  static String _driverPhone(Map<String, dynamic> driver) =>
+      (driver['phone'] ??
+              driver['phone_number'] ??
+              driver['phoneNumber'] ??
+              driver['driver_phone'] ??
+              '')
+          .toString()
+          .trim();
+
   // ── Stream shipment for a driver (real-time) ──────────────
-  static Stream<List<Map<String, dynamic>>> streamDriverShipments(String driverId) {
+  static Stream<List<Map<String, dynamic>>> streamDriverShipments(
+    String driverId,
+  ) {
     if (driverId.isEmpty) return const Stream.empty();
     return _client
         .from('shipments')
@@ -303,7 +421,9 @@ class ShipmentService {
         .from('shipments')
         .stream(primaryKey: ['id'])
         .eq('id', shipmentId)
-        .map((rows) => rows.isEmpty ? null : Map<String, dynamic>.from(rows.first));
+        .map(
+          (rows) => rows.isEmpty ? null : Map<String, dynamic>.from(rows.first),
+        );
   }
 
   // ── Find driver by ID (for navigation details) ───────────

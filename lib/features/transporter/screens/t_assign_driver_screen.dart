@@ -52,7 +52,13 @@ class _TAssignDriverTabState extends State<TAssignDriverTab>
           .maybeSingle();
 
       if (transporter == null) {
-        if (mounted) setState(() { _unassigned = []; _assigned = []; _loading = false; });
+        if (mounted) {
+          setState(() {
+            _unassigned = [];
+            _assigned = [];
+            _loading = false;
+          });
+        }
         return;
       }
 
@@ -88,7 +94,13 @@ class _TAssignDriverTabState extends State<TAssignDriverTab>
         });
       }
     } catch (_) {
-      if (mounted) setState(() { _unassigned = []; _assigned = []; _loading = false; });
+      if (mounted) {
+        setState(() {
+          _unassigned = [];
+          _assigned = [];
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -101,7 +113,11 @@ class _TAssignDriverTabState extends State<TAssignDriverTab>
         elevation: 0,
         title: Text(
           'Assign Driver',
-          style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w700, color: Colors.white),
+          style: GoogleFonts.inter(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
         ),
         bottom: TabBar(
           controller: _tabCtrl,
@@ -109,8 +125,14 @@ class _TAssignDriverTabState extends State<TAssignDriverTab>
           unselectedLabelColor: Colors.white60,
           indicatorColor: AppColors.primaryAmber,
           indicatorWeight: 2.5,
-          labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
-          unselectedLabelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+          labelStyle: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
           tabs: [
             Tab(text: 'Unassigned (${_unassigned.length})'),
             Tab(text: 'Assigned (${_assigned.length})'),
@@ -157,14 +179,22 @@ class _ShipmentList extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              showChangeButton ? Icons.check_circle_outline_rounded : Icons.person_add_alt_1_rounded,
+              showChangeButton
+                  ? Icons.check_circle_outline_rounded
+                  : Icons.person_add_alt_1_rounded,
               size: 48,
               color: AppColors.textMuted,
             ),
             const SizedBox(height: 12),
             Text(
-              showChangeButton ? 'No assigned drivers yet' : 'All drivers assigned!',
-              style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+              showChangeButton
+                  ? 'No assigned drivers yet'
+                  : 'All drivers assigned!',
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
           ],
         ),
@@ -177,7 +207,7 @@ class _ShipmentList extends StatelessWidget {
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: shipments.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (_, i) => _ShipmentDriverCard(
           shipment: shipments[i],
           showChangeButton: showChangeButton,
@@ -201,7 +231,8 @@ class _ShipmentDriverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final code = shipment['shipment_code'] ??
+    final code =
+        shipment['shipment_code'] ??
         (shipment['id'] as String).substring(0, 8).toUpperCase();
     final from = shipment['pickup_city'] as String? ?? '—';
     final to = shipment['receiver_city'] as String? ?? '—';
@@ -221,10 +252,15 @@ class _ShipmentDriverCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(code, style: GoogleFonts.inter(
-                fontSize: 13, fontWeight: FontWeight.w800,
-                color: AppColors.primaryAmber, letterSpacing: 0.5,
-              )),
+              Text(
+                code,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primaryAmber,
+                  letterSpacing: 0.5,
+                ),
+              ),
               const Spacer(),
               StatusBadge(status: status),
             ],
@@ -232,16 +268,40 @@ class _ShipmentDriverCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.radio_button_checked, size: 12, color: AppColors.primaryNavy),
+              const Icon(
+                Icons.radio_button_checked,
+                size: 12,
+                color: AppColors.primaryNavy,
+              ),
               const SizedBox(width: 6),
-              Text(from, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(
+                from,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.textMuted),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 14,
+                  color: AppColors.textMuted,
+                ),
               ),
-              const Icon(Icons.location_on, size: 12, color: AppColors.secondaryRed),
+              const Icon(
+                Icons.location_on,
+                size: 12,
+                color: AppColors.secondaryRed,
+              ),
               const SizedBox(width: 6),
-              Text(to, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(
+                to,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
           if (showChangeButton && driverName.isNotEmpty) ...[
@@ -255,7 +315,11 @@ class _ShipmentDriverCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded, color: AppColors.supportGreen, size: 16),
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.supportGreen,
+                    size: 16,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -263,10 +327,20 @@ class _ShipmentDriverCard extends StatelessWidget {
                       children: [
                         Text(
                           driverName,
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                         if (driverPhone.isNotEmpty)
-                          Text(driverPhone, style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted)),
+                          Text(
+                            driverPhone,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -280,15 +354,29 @@ class _ShipmentDriverCard extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () => _showAssignModal(context),
-                  icon: Icon(showChangeButton ? Icons.swap_horiz_rounded : Icons.person_add_alt_1_rounded, size: 16),
-                  label: Text(showChangeButton ? 'Change Driver' : 'Assign Driver'),
+                  icon: Icon(
+                    showChangeButton
+                        ? Icons.swap_horiz_rounded
+                        : Icons.person_add_alt_1_rounded,
+                    size: 16,
+                  ),
+                  label: Text(
+                    showChangeButton ? 'Change Driver' : 'Assign Driver',
+                  ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: showChangeButton ? AppColors.primaryNavy : AppColors.primaryAmber,
+                    backgroundColor: showChangeButton
+                        ? AppColors.primaryNavy
+                        : AppColors.primaryAmber,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -335,7 +423,16 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
   Map<String, dynamic>? _selected;
   bool _searching = false;
   bool _submitting = false;
+  bool _saving = false;
   bool _searched = false;
+  String? _error;
+  String? _transporterId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransporter();
+  }
 
   @override
   void dispose() {
@@ -349,43 +446,128 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
     final phone = _phoneCtrl.text.trim();
     if (name.isEmpty && phone.isEmpty) return;
 
-    setState(() { _searching = true; _searched = false; _matches = []; _selected = null; });
+    setState(() {
+      _searching = true;
+      _searched = false;
+      _matches = [];
+      _selected = null;
+      _error = null;
+    });
 
-    final results = await ShipmentService.searchDrivers(name: name.isEmpty ? null : name, phone: phone.isEmpty ? null : phone);
-    if (mounted) {
-      setState(() {
-        _matches = results;
-        _searching = false;
-        _searched = true;
-        if (results.length == 1) _selected = results.first;
-      });
+    try {
+      final results = await ShipmentService.searchDrivers(
+        name: name.isEmpty ? null : name,
+        phone: phone.isEmpty ? null : phone,
+      );
+      if (mounted) {
+        setState(() {
+          _matches = results;
+          _searching = false;
+          _searched = true;
+          _selected =
+              results
+                  .where((driver) => driver['_phone_exact_match'] == true)
+                  .cast<Map<String, dynamic>?>()
+                  .firstOrNull ??
+              (results.length == 1 ? results.first : null);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _searching = false;
+          _searched = true;
+          _error = 'Could not search drivers: ${e.toString()}';
+        });
+      }
     }
+  }
+
+  Future<void> _loadTransporter() async {
+    try {
+      final transporterId = await ShipmentService.getCurrentTransporterId();
+      if (mounted) setState(() => _transporterId = transporterId);
+    } catch (_) {}
   }
 
   Future<void> _confirm() async {
     if (_selected == null) return;
     setState(() => _submitting = true);
 
-    await ShipmentService.assignDriverToShipment(
-      shipmentId: widget.shipment['id'] as String,
-      driverId: _selected!['id'] as String?,
-      driverName: (_selected!['full_name'] ?? _selected!['fullName']) as String?,
-      driverPhone: (_selected!['phone'] ?? _selected!['phoneNumber']) as String?,
-    );
+    try {
+      await ShipmentService.assignDriverToShipment(
+        shipmentId: widget.shipment['id'] as String,
+        driverId: _selected!['id'] as String?,
+        driverName:
+            (_selected!['full_name'] ?? _selected!['fullName']) as String?,
+        driverPhone:
+            (_selected!['phone'] ?? _selected!['phoneNumber']) as String?,
+      );
 
-    if (mounted) {
-      Navigator.pop(context);
-      widget.onAssigned();
+      if (mounted) {
+        Navigator.pop(context);
+        widget.onAssigned();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+          _error = 'Could not assign driver: ${e.toString()}';
+        });
+      }
+    }
+  }
+
+  Future<void> _saveSelectedDriver() async {
+    final selected = _selected;
+    final transporterId = _transporterId;
+    final driverId = selected?['id']?.toString();
+    if (selected == null ||
+        driverId == null ||
+        driverId.isEmpty ||
+        transporterId == null ||
+        transporterId.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+
+    try {
+      await ShipmentService.saveDriverToTransporterList(
+        driverId: driverId,
+        transporterId: transporterId,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        selected['transporter_id'] = transporterId;
+        final idx = _matches.indexWhere((m) => m['id']?.toString() == driverId);
+        if (idx >= 0) _matches[idx]['transporter_id'] = transporterId;
+        _saving = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _error = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final code = widget.shipment['shipment_code'] ??
+    final code =
+        widget.shipment['shipment_code'] ??
         (widget.shipment['id'] as String).substring(0, 8).toUpperCase();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         decoration: const BoxDecoration(
           color: AppColors.white,
@@ -398,24 +580,39 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
           children: [
             Center(
               child: Container(
-                width: 40, height: 4,
-                decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(100)),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(100),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             Text(
               widget.isChange ? 'Change Driver' : 'Assign Driver',
-              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               code,
-              style: GoogleFonts.inter(fontSize: 13, color: AppColors.primaryAmber, fontWeight: FontWeight.w700),
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: AppColors.primaryAmber,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             if (widget.isChange) ...[
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.amberLight,
                   borderRadius: BorderRadius.circular(8),
@@ -424,11 +621,19 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.info_outline_rounded, size: 14, color: AppColors.primaryAmber),
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      size: 14,
+                      color: AppColors.primaryAmber,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Currently: ${widget.shipment['driver_name'] ?? 'Unknown'}',
-                      style: GoogleFonts.inter(fontSize: 12, color: AppColors.primaryAmber, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppColors.primaryAmber,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -444,12 +649,25 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                     controller: _nameCtrl,
                     decoration: InputDecoration(
                       hintText: 'Driver name',
-                      hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 13),
+                      hintStyle: GoogleFonts.inter(
+                        color: AppColors.textMuted,
+                        fontSize: 13,
+                      ),
                       filled: true,
                       fillColor: AppColors.background,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      prefixIcon: const Icon(Icons.person_outline, size: 18, color: AppColors.textMuted),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.person_outline,
+                        size: 18,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ),
                 ),
@@ -460,12 +678,25 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       hintText: 'Phone number',
-                      hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 13),
+                      hintStyle: GoogleFonts.inter(
+                        color: AppColors.textMuted,
+                        fontSize: 13,
+                      ),
                       filled: true,
                       fillColor: AppColors.background,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      prefixIcon: const Icon(Icons.phone_outlined, size: 18, color: AppColors.textMuted),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.phone_outlined,
+                        size: 18,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ),
                 ),
@@ -477,7 +708,14 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
               child: ElevatedButton.icon(
                 onPressed: _searching ? null : _search,
                 icon: _searching
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Icon(Icons.search_rounded, size: 18),
                 label: Text(_searching ? 'Searching...' : 'Search Drivers'),
                 style: ElevatedButton.styleFrom(
@@ -485,8 +723,13 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  textStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -494,7 +737,7 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
             // Results
             if (_searched) ...[
               const SizedBox(height: 16),
-              if (_matches.isEmpty)
+              if (_error != null)
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -504,11 +747,46 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search_off_rounded, color: AppColors.secondaryRed, size: 16),
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: AppColors.secondaryRed,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _error!,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: AppColors.secondaryRed,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else if (_matches.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.redLight,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.redBorder),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.search_off_rounded,
+                        color: AppColors.secondaryRed,
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'No drivers found matching your search.',
-                        style: GoogleFonts.inter(fontSize: 13, color: AppColors.secondaryRed),
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: AppColors.secondaryRed,
+                        ),
                       ),
                     ],
                   ),
@@ -516,13 +794,33 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
               else ...[
                 Text(
                   '${_matches.length} driver${_matches.length == 1 ? '' : 's'} found',
-                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textMuted, letterSpacing: 0.5),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textMuted,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 ...(_matches.map((m) {
-                  final name = (m['full_name'] ?? m['fullName'] ?? '—') as String;
-                  final phone = (m['phone'] ?? m['phoneNumber'] ?? '—') as String;
-                  final isSel = _selected != null && _selected!['id'] == m['id'];
+                  final name =
+                      (m['full_name'] ?? m['fullName'] ?? '—') as String;
+                  final phone =
+                      (m['phone'] ?? m['phoneNumber'] ?? '—') as String;
+                  final isSel =
+                      _selected != null && _selected!['id'] == m['id'];
+                  final isPhoneMatch = m['_phone_exact_match'] == true;
+                  final savedTransporterId = m['transporter_id']
+                      ?.toString()
+                      .trim();
+                  final isSavedByMe =
+                      savedTransporterId != null &&
+                      savedTransporterId.isNotEmpty &&
+                      savedTransporterId == _transporterId;
+                  final isSavedByOther =
+                      savedTransporterId != null &&
+                      savedTransporterId.isNotEmpty &&
+                      savedTransporterId != _transporterId;
                   return GestureDetector(
                     onTap: () => setState(() => _selected = m),
                     child: AnimatedContainer(
@@ -530,27 +828,41 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isSel ? AppColors.navyLight : AppColors.background,
+                        color: isPhoneMatch
+                            ? AppColors.greenLight
+                            : (isSel
+                                  ? AppColors.navyLight
+                                  : AppColors.background),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSel ? AppColors.primaryNavy : AppColors.border,
-                          width: isSel ? 2 : 1,
+                          color: isPhoneMatch
+                              ? AppColors.supportGreen
+                              : (isSel
+                                    ? AppColors.primaryNavy
+                                    : AppColors.border),
+                          width: (isSel || isPhoneMatch) ? 2 : 1,
                         ),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            width: 40, height: 40,
+                            width: 40,
+                            height: 40,
                             decoration: BoxDecoration(
-                              color: isSel ? AppColors.primaryNavy : AppColors.border,
+                              color: isSel
+                                  ? AppColors.primaryNavy
+                                  : AppColors.border,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
                               child: Text(
                                 name.isNotEmpty ? name[0].toUpperCase() : '?',
                                 style: GoogleFonts.inter(
-                                  fontSize: 16, fontWeight: FontWeight.w800,
-                                  color: isSel ? Colors.white : AppColors.textSecondary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: isSel
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
                                 ),
                               ),
                             ),
@@ -560,16 +872,113 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(name, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                                Text(phone, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted)),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    if (isSavedByMe || isSavedByOther)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSavedByMe
+                                              ? AppColors.greenLight
+                                              : AppColors.amberLight,
+                                          borderRadius: BorderRadius.circular(
+                                            999,
+                                          ),
+                                          border: Border.all(
+                                            color: isSavedByMe
+                                                ? AppColors.greenBorder
+                                                : AppColors.amberBorder,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          isSavedByMe
+                                              ? 'Saved'
+                                              : 'Saved elsewhere',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: isSavedByMe
+                                                ? AppColors.supportGreen
+                                                : AppColors.primaryAmber,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        phone,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    ),
+                                    if (isSel && !isSavedByMe)
+                                      TextButton.icon(
+                                        onPressed: isSavedByOther || _saving
+                                            ? null
+                                            : _saveSelectedDriver,
+                                        icon: _saving
+                                            ? const SizedBox(
+                                                width: 12,
+                                                height: 12,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              )
+                                            : const Icon(
+                                                Icons.bookmark_add_outlined,
+                                                size: 14,
+                                              ),
+                                        label: Text(
+                                          isSavedByOther ? 'Taken' : 'Save',
+                                        ),
+                                        style: TextButton.styleFrom(
+                                          visualDensity: VisualDensity.compact,
+                                          padding: EdgeInsets.zero,
+                                          textStyle: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
                           if (isSel)
                             Container(
-                              width: 24, height: 24,
-                              decoration: const BoxDecoration(color: AppColors.primaryNavy, shape: BoxShape.circle),
-                              child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: isPhoneMatch
+                                    ? AppColors.supportGreen
+                                    : AppColors.primaryNavy,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ),
                         ],
                       ),
@@ -590,11 +999,21 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_rounded, color: AppColors.supportGreen, size: 16),
+                    const Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.supportGreen,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
-                    Text(
-                      'Selected: ${(_selected!['full_name'] ?? _selected!['fullName'] ?? '—')}',
-                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.supportGreen),
+                    Expanded(
+                      child: Text(
+                        'Selected: ${(_selected!['full_name'] ?? _selected!['fullName'] ?? '—')}',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.supportGreen,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -605,16 +1024,34 @@ class _AssignDriverSheetState extends State<_AssignDriverSheet> {
                 child: ElevatedButton.icon(
                   onPressed: _submitting ? null : _confirm,
                   icon: _submitting
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                       : const Icon(Icons.check_rounded, size: 18),
-                  label: Text(_submitting ? 'Assigning...' : (widget.isChange ? 'Confirm Change' : 'Confirm Assignment')),
+                  label: Text(
+                    _submitting
+                        ? 'Assigning...'
+                        : (widget.isChange
+                              ? 'Confirm Change'
+                              : 'Confirm Assignment'),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.supportGreen,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    textStyle: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
